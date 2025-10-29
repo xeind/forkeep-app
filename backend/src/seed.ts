@@ -82,7 +82,7 @@ async function createUser(name: string, gender: string) {
   ];
   
   const passwordHash = await bcrypt.hash('password123', 10);
-  const email = `${name.toLowerCase()}@swaylo.app`;
+  const email = `${name.toLowerCase()}@forkeep.app`;
 
   return prisma.user.create({
     data: {
@@ -190,7 +190,7 @@ async function main() {
   console.log(`  - Swipes: ${swipeCount}`);
   console.log(`  - Matches: ${matchCount}`);
   console.log('\n💡 Test credentials:');
-  console.log(`  Email: alex@swaylo.app`);
+  console.log(`  Email: alex@forkeep.app`);
   console.log(`  Password: password123`);
   console.log('\n  (All users have password: password123)');
 }

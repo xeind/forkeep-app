@@ -37,19 +37,19 @@ let authToken: string | null = null;
 
 export const setAuthToken = (token: string) => {
   authToken = token;
-  localStorage.setItem('swaylo_token', token);
+  localStorage.setItem('forkeep_token', token);
 };
 
 export const getAuthToken = (): string | null => {
   if (!authToken) {
-    authToken = localStorage.getItem('swaylo_token');
+    authToken = localStorage.getItem('forkeep_token');
   }
   return authToken;
 };
 
 export const clearAuthToken = () => {
   authToken = null;
-  localStorage.removeItem('swaylo_token');
+  localStorage.removeItem('forkeep_token');
 };
 
 const authFetch = async (url: string, options: RequestInit = {}) => {

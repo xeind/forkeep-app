@@ -14,23 +14,23 @@ import AppLayout from './components/AppLayout.tsx';
 import Navbar from './components/Navbar.tsx';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const token = localStorage.getItem('swaylo_token');
+  const token = localStorage.getItem('forkeep_token');
   return token ? <>{children}</> : <Navigate to="/" replace />;
 }
 
 function ProtectedRouteWithLayout({ children }: { children: React.ReactNode }) {
-  const token = localStorage.getItem('swaylo_token');
+  const token = localStorage.getItem('forkeep_token');
   return token ? <AppLayout>{children}</AppLayout> : <Navigate to="/" replace />;
 }
 
 function GuestRoute({ children }: { children: React.ReactNode }) {
-  const token = localStorage.getItem('swaylo_token');
+  const token = localStorage.getItem('forkeep_token');
   return !token ? <>{children}</> : <Navigate to="/discover" replace />;
 }
 
 function AppRoutes() {
   const location = useLocation();
-  const token = localStorage.getItem('swaylo_token');
+  const token = localStorage.getItem('forkeep_token');
   const isAuthPage = location.pathname === '/' || location.pathname === '/signup';
   const showNavbar = token && !location.pathname.startsWith('/chat') && !isAuthPage;
 

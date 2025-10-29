@@ -30,7 +30,7 @@ export default function Login() {
       <div className="w-full max-w-md space-y-8 rounded-3xl bg-white/80 p-10 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] ring-1 ring-white/20 backdrop-blur-xl">
         <div className="text-center">
           <h1 className="bg-linear-to-r from-pink-600 to-purple-600 bg-clip-text pb-1 text-5xl leading-tight font-bold text-transparent">
-            Swaylo
+            Forkeep
           </h1>
           <p className="mt-3 text-sm text-gray-600">Find your perfect match</p>
         </div>
@@ -103,7 +103,7 @@ export default function Login() {
 
         <div className="mt-6 text-center">
           <p className="text-xs text-gray-500">
-            Demo: ben@swaylo.app / password123
+            Demo: ben@forkeep.app / password123
           </p>
         </div>
       </div>
