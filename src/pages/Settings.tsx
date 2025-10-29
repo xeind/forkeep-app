@@ -99,7 +99,7 @@ export default function Settings() {
             </div>
             <div className="space-y-2 px-6 py-4 text-sm text-gray-600">
               <p>Version 1.0.0</p>
-              <p>Made with ❤️ by Swaylo Team</p>
+              <p>Made with ❤️ by Forkeep Team</p>
             </div>
           </div>
         </div>

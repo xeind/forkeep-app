@@ -17,7 +17,7 @@ app.use(cors());
 app.use(express.json());
 
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok', message: 'Swaylo API is running' });
+  res.json({ status: 'ok', message: 'Forkeep API is running' });
 });
 
 app.use('/api/auth', authRouter);

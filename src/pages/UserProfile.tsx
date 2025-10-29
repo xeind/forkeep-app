@@ -76,7 +76,7 @@ export default function UserProfile() {
   };
 
   const getCurrentUserId = () => {
-    const token = localStorage.getItem('swaylo_token');
+    const token = localStorage.getItem('forkeep_token');
     if (!token) return null;
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
