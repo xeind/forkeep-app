@@ -26,22 +26,6 @@ export default function Settings() {
         <div className="space-y-6">
           <div className="overflow-hidden rounded-3xl bg-white/80 shadow-[0_10px_30px_-5px_rgba(0,0,0,0.1)] ring-1 ring-white/20 backdrop-blur-xl">
             <div className="border-b border-zinc-950/5 px-6 py-4">
-              <h2 className="text-lg font-semibold text-gray-900">Account</h2>
-            </div>
-            <div className="space-y-4 p-6">
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={handleLogout}
-                className="w-full rounded-full bg-linear-to-r from-red-500 to-red-600 px-6 py-3 font-semibold text-white shadow-[0_10px_30px_-5px_rgba(239,68,68,0.4)] ring-1 ring-red-600/20 transition-all duration-200 ease-out hover:shadow-[0_15px_40px_-5px_rgba(239,68,68,0.5)]"
-              >
-                Logout
-              </motion.button>
-            </div>
-          </div>
-
-          <div className="overflow-hidden rounded-3xl bg-white/80 shadow-[0_10px_30px_-5px_rgba(0,0,0,0.1)] ring-1 ring-white/20 backdrop-blur-xl">
-            <div className="border-b border-zinc-950/5 px-6 py-4">
               <h2 className="text-lg font-semibold text-gray-900">
                 Notifications
               </h2>
@@ -91,6 +75,21 @@ export default function Settings() {
                 </div>
                 <AnimatedCheckbox defaultChecked />
               </div>
+            </div>
+          </div>
+          <div className="overflow-hidden rounded-3xl bg-white/80 shadow-[0_10px_30px_-5px_rgba(0,0,0,0.1)] ring-1 ring-white/20 backdrop-blur-xl">
+            <div className="border-b border-zinc-950/5 px-6 py-4">
+              <h2 className="text-lg font-semibold text-gray-900">Account</h2>
+            </div>
+            <div className="space-y-4 p-6">
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleLogout}
+                className="w-full rounded-full bg-linear-to-r from-red-500 to-red-600 px-6 py-3 font-semibold text-white shadow-[0_10px_30px_-5px_rgba(239,68,68,0.4)] ring-1 ring-red-600/20 transition-all duration-200 ease-out hover:shadow-[0_15px_40px_-5px_rgba(239,68,68,0.5)]"
+              >
+                Logout
+              </motion.button>
             </div>
           </div>
 

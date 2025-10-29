@@ -20,12 +20,22 @@ export default function UserProfile() {
   const { userId } = useParams<{ userId: string }>();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [matchId, setMatchId] = useState<string | null>(null);
+  const [unreadCount, setUnreadCount] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!userId) return;
     fetchProfile(userId);
+    fetchMatchInfo(userId);
   }, [userId]);
+
+  useEffect(() => {
+    if (!matchId) return;
+    fetchUnreadCount();
+    const interval = setInterval(fetchUnreadCount, 5000);
+    return () => clearInterval(interval);
+  }, [matchId]);
 
   const fetchProfile = async (id: string) => {
     try {
@@ -36,6 +46,43 @@ export default function UserProfile() {
       console.error('Failed to fetch profile:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchMatchInfo = async (userId: string) => {
+    try {
+      const data = await api.matches.list();
+      const match = data.matches.find((m) => m.matchedUser.id === userId);
+      if (match) {
+        setMatchId(match.id);
+      }
+    } catch (err) {
+      console.error('Failed to fetch match info:', err);
+    }
+  };
+
+  const fetchUnreadCount = async () => {
+    if (!matchId) return;
+    try {
+      const data = await api.messages.getByMatch(matchId);
+      const currentUserId = getCurrentUserId();
+      const unread = data.messages.filter(
+        (msg) => !msg.read && msg.receiverId === currentUserId
+      ).length;
+      setUnreadCount(unread);
+    } catch (err) {
+      console.error('Failed to fetch unread count:', err);
+    }
+  };
+
+  const getCurrentUserId = () => {
+    const token = localStorage.getItem('swaylo_token');
+    if (!token) return null;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.userId;
+    } catch {
+      return null;
     }
   };
 
@@ -145,6 +192,37 @@ export default function UserProfile() {
               </div>
             </div>
           </motion.div>
+
+          {matchId && (
+            <motion.button
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
+              onClick={() => navigate(`/chat/${matchId}`)}
+              className="absolute bottom-6 right-6 flex h-14 w-14 items-center justify-center rounded-full bg-pink-500 shadow-lg ring-1 ring-pink-600/20 transition-all duration-200 ease-out hover:bg-pink-600 hover:shadow-xl"
+            >
+              <svg
+                className="h-6 w-6 text-white"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                />
+              </svg>
+              {unreadCount > 0 && (
+                <div className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white shadow-md ring-2 ring-white">
+                  {unreadCount}
+                </div>
+              )}
+            </motion.button>
+          )}
         </div>
 
         <motion.button

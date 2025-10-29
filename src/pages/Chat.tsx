@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef, type FormEvent } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { api, type Message, type Match } from '../lib/api';
-import Spinner from '../components/Spinner';
+import { getCurrentUserId } from '../utils/auth';
+import LoadingState from '../components/common/LoadingState';
+import Input from '../components/common/Input';
 
 export default function Chat() {
   const { matchId } = useParams<{ matchId: string }>();
@@ -72,28 +74,10 @@ export default function Chat() {
     }
   };
 
-  const getCurrentUserId = () => {
-    const token = localStorage.getItem('swaylo_token');
-    if (!token) return null;
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      return payload.userId;
-    } catch {
-      return null;
-    }
-  };
-
   const currentUserId = getCurrentUserId();
 
   if (loading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="text-center">
-          <Spinner color="#ec4899" size={48} />
-          <p className="mt-4 text-gray-600">Loading chat...</p>
-        </div>
-      </div>
-    );
+    return <LoadingState message="Loading chat..." />;
   }
 
   return (
@@ -187,13 +171,13 @@ export default function Chat() {
           onSubmit={handleSendMessage}
           className="mx-auto flex max-w-4xl items-center gap-2"
         >
-          <input
+          <Input
             type="text"
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Type a message..."
-            className="flex-1 rounded-full border-0 px-6 py-3 text-gray-900 shadow-sm ring-1 ring-zinc-950/10 transition-all duration-200 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500"
             disabled={sending}
+            className="flex-1"
           />
           <button
             type="submit"

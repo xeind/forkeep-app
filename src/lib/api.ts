@@ -113,8 +113,13 @@ export const api = {
   },
 
   users: {
-    discover: async (): Promise<{ users: User[] }> => {
-      return authFetch('/api/users/discover');
+    discover: async (cursor?: string, limit = 10): Promise<{ users: User[]; nextCursor: string | null; hasMore: boolean }> => {
+      const params = new URLSearchParams();
+      if (cursor) params.append('cursor', cursor);
+      params.append('limit', limit.toString());
+      
+      const queryString = params.toString();
+      return authFetch(`/api/users/discover${queryString ? `?${queryString}` : ''}`);
     },
   },
 
@@ -133,6 +138,12 @@ export const api = {
   matches: {
     list: async (): Promise<{ matches: Match[] }> => {
       return authFetch('/api/matches');
+    },
+
+    delete: async (matchId: string): Promise<{ success: boolean }> => {
+      return authFetch(`/api/matches/${matchId}`, {
+        method: 'DELETE',
+      });
     },
   },
 

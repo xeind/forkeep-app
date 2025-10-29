@@ -49,7 +49,7 @@ export default function AnimatedCheckbox({
               pathLength: checked ? 1 : 0,
               opacity: checked ? 1 : 0,
             }}
-            transition={{ duration: 0.2, ease: 'easeOut' }}
+            transition={{ duration: 0.15, ease: 'easeOut' }}
           />
         </svg>
       </motion.div>

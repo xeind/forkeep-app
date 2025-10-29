@@ -58,18 +58,45 @@ export const createSwipe = async (req: Request, res: Response) => {
       });
 
       if (mutualSwipe) {
-        const match = await prisma.match.create({
-          data: {
-            user1Id: userId,
-            user2Id: swipedUserId,
-          },
-        });
+        const [user1Id, user2Id] = userId < swipedUserId 
+          ? [userId, swipedUserId]
+          : [swipedUserId, userId];
 
-        return res.status(201).json({
-          success: true,
-          match: true,
-          matchId: match.id,
-        });
+        try {
+          const match = await prisma.match.create({
+            data: {
+              user1Id,
+              user2Id,
+            },
+          });
+
+          console.log(`✨ Match created: ${match.id} between ${user1Id} and ${user2Id}`);
+
+          return res.status(201).json({
+            success: true,
+            match: true,
+            matchId: match.id,
+          });
+        } catch (matchError) {
+          console.error('Match creation error:', matchError);
+          const existingMatch = await prisma.match.findFirst({
+            where: {
+              user1Id,
+              user2Id,
+            },
+          });
+
+          if (existingMatch) {
+            console.log(`Match already exists: ${existingMatch.id}`);
+            return res.status(201).json({
+              success: true,
+              match: true,
+              matchId: existingMatch.id,
+            });
+          }
+
+          throw matchError;
+        }
       }
     }
 

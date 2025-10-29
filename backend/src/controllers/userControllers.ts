@@ -9,7 +9,9 @@ export const getDiscoverUsers = async (req: Request, res: Response) => {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    // Get current user's preferences
+    const cursor = req.query.cursor as string | undefined;
+    const limit = parseInt(req.query.limit as string) || 10;
+
     const currentUser = await prisma.user.findUnique({
       where: { id: userId },
       select: { lookingFor: true },
@@ -19,13 +21,16 @@ export const getDiscoverUsers = async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'User not found!' });
     }
 
-    // All users that has already swiped on
     const swipedUserIds = await prisma.swipe.findMany({
       where: { swiperId: userId },
       select: { swipedId: true },
     });
 
     const swipedIds = swipedUserIds.map((swipe) => swipe.swipedId);
+
+    const genderFilter = currentUser.lookingFor === 'Everyone' 
+      ? {} 
+      : { gender: currentUser.lookingFor };
 
     const users = await prisma.user.findMany({
       where: {
@@ -36,9 +41,7 @@ export const getDiscoverUsers = async (req: Request, res: Response) => {
           {
             id: { notIn: swipedIds },
           },
-          {
-            gender: currentUser.lookingFor,
-          },
+          genderFilter,
         ],
       },
       select: {
@@ -50,10 +53,20 @@ export const getDiscoverUsers = async (req: Request, res: Response) => {
         photoUrl: true,
         photos: true,
       },
-      take: 20,
+      take: limit + 1,
+      ...(cursor && { skip: 1, cursor: { id: cursor } }),
+      orderBy: { createdAt: 'desc' },
     });
 
-    res.json({ users });
+    const hasMore = users.length > limit;
+    const resultUsers = hasMore ? users.slice(0, limit) : users;
+    const nextCursor = hasMore ? resultUsers[resultUsers.length - 1].id : null;
+
+    res.json({ 
+      users: resultUsers,
+      nextCursor,
+      hasMore,
+    });
   } catch (error) {
     console.error('Discover error:', error);
     res.status(500).json({ error: 'Internal server error' });

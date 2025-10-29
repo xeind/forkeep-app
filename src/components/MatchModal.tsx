@@ -4,14 +4,15 @@ import { useNavigate } from 'react-router-dom';
 interface MatchModalProps {
   userName: string;
   userPhoto: string;
+  userId: string;
   onClose: () => void;
 }
 
-export default function MatchModal({ userName, userPhoto, onClose }: MatchModalProps) {
+export default function MatchModal({ userName, userPhoto, userId, onClose }: MatchModalProps) {
   const navigate = useNavigate();
 
-  const handleViewMatches = () => {
-    navigate('/matches');
+  const handleViewProfile = () => {
+    navigate(`/profile/${userId}`);
   };
 
   return (
@@ -75,12 +76,12 @@ export default function MatchModal({ userName, userPhoto, onClose }: MatchModalP
               duration: 0.25,
               ease: [0.215, 0.61, 0.355, 1],
             }}
-            onClick={handleViewMatches}
+            onClick={handleViewProfile}
             className="w-full rounded-full bg-white px-6 py-3 font-semibold text-purple-600 transition-all duration-200 ease-[cubic-bezier(0.215,0.61,0.355,1)]"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
-            View Matches
+            View Profile
           </motion.button>
 
           <motion.button
