@@ -1,11 +1,12 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { randomUUID } from 'crypto';
 import prisma from '../prisma';
 import type { Request, Response } from 'express';
 
 export const signup = async (req: Request, res: Response) => {
   try {
-    const { email, password, name, age, gender, lookingFor, bio, photoUrl } =
+    const { email, password, name, age, gender, lookingFor, bio, photoUrl, province, city, photos } =
       req.body;
 
     // Validation of required fields
@@ -20,9 +21,14 @@ export const signup = async (req: Request, res: Response) => {
 
     const passwordHash = await bcrypt.hash(password, 10);
 
+    const photosArray = photos && Array.isArray(photos) && photos.length > 0
+      ? [photoUrl, ...photos].filter(Boolean)
+      : [photoUrl || 'https:i.pravatar.cc/400'];
+
     // Create User
     const user = await prisma.user.create({
       data: {
+        id: randomUUID(),
         email,
         passwordHash,
         name,
@@ -31,16 +37,23 @@ export const signup = async (req: Request, res: Response) => {
         lookingFor,
         bio: bio || '',
         photoUrl: photoUrl || 'https:i.pravatar.cc/400',
-        photos: [photoUrl || 'https:i.pravatar.cc/400'],
+        photos: photosArray,
+        province: province || null,
+        city: city || null,
+        updatedAt: new Date(),
       },
     });
 
-    // Generate JWT
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!);
+    // Generate JWT with shuffle seed for consistent user ordering
+    const shuffleSeed = Math.floor(Math.random() * 1000000);
+    const token = jwt.sign({ userId: user.id, shuffleSeed }, process.env.JWT_SECRET!);
 
     // Return user without password
     const { passwordHash: _, ...userWithoutPassword } = user;
-    res.status(201).json({ token, user: userWithoutPassword });
+    res.status(201).json({ 
+      token, 
+      user: userWithoutPassword
+    });
   } catch (error) {
     console.error('Signup error:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -67,12 +80,16 @@ export const login = async (req: Request, res: Response) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    // Generate JWT
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!);
+    // Generate JWT with shuffle seed for consistent user ordering
+    const shuffleSeed = Math.floor(Math.random() * 1000000);
+    const token = jwt.sign({ userId: user.id, shuffleSeed }, process.env.JWT_SECRET!);
 
     // Return user without password
     const { passwordHash: _, ...userWithoutPassword } = user;
-    res.json({ token, user: userWithoutPassword });
+    res.json({ 
+      token, 
+      user: userWithoutPassword
+    });
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ error: 'Internal server error' });

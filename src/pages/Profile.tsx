@@ -3,6 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { api } from '../lib/api';
 import Spinner from '../components/Spinner';
+import { getAllProvinces, getCitiesByProvince } from '../data/philippinesLocations';
+import { MotionButton } from '@/components/MotionButton';
+import FormInput from '@/components/FormInput';
+import FormTextarea from '@/components/FormTextarea';
+import FormSelect from '@/components/FormSelect';
 
 interface UserProfile {
   id: string;
@@ -12,7 +17,8 @@ interface UserProfile {
   gender: string;
   bio: string;
   photoUrl: string;
-  location?: string;
+  province?: string | null;
+  city?: string | null;
   lookingFor: string;
 }
 
@@ -26,6 +32,8 @@ export default function Profile() {
     name: '',
     age: '',
     bio: '',
+    province: '',
+    city: '',
   });
   const navigate = useNavigate();
 
@@ -42,6 +50,8 @@ export default function Profile() {
         name: data.user.name,
         age: data.user.age.toString(),
         bio: data.user.bio,
+        province: data.user.province || '',
+        city: data.user.city || '',
       });
     } catch (err) {
       console.error('Failed to fetch profile:', err);
@@ -68,6 +78,8 @@ export default function Profile() {
         name: formData.name,
         age: ageNum,
         bio: formData.bio,
+        province: formData.province || undefined,
+        city: formData.city || undefined,
       });
 
       await fetchProfile();
@@ -150,7 +162,7 @@ export default function Profile() {
 
                   <p className="mt-2 text-sm text-gray-600">{profile.bio}</p>
 
-                  {profile.location && (
+                  {(profile.city || profile.province) && (
                     <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-linear-to-r from-pink-50 to-purple-50 px-3 py-1.5">
                       <svg
                         className="h-3.5 w-3.5 text-pink-500"
@@ -164,7 +176,7 @@ export default function Profile() {
                         />
                       </svg>
                       <span className="text-xs font-medium text-gray-600">
-                        {profile.location}
+                        {profile.city && profile.province ? `${profile.city}, ${profile.province}` : profile.city || profile.province}
                       </span>
                     </div>
                   )}
@@ -192,22 +204,19 @@ export default function Profile() {
             </div>
 
             <div className="flex w-96 gap-3">
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+              <MotionButton
                 onClick={() => setEditing(true)}
-                className="flex-1 rounded-full bg-linear-to-r from-pink-500 to-pink-600 px-6 py-3 font-semibold text-white shadow-[0_10px_30px_-5px_rgba(236,72,153,0.4)] ring-1 ring-pink-600/20 transition-all duration-200 ease-out hover:shadow-[0_15px_40px_-5px_rgba(236,72,153,0.5)]"
+                className="flex-1 bg-linear-to-r from-pink-500 to-pink-600 shadow-[0_10px_30px_-5px_rgba(236,72,153,0.4)] hover:shadow-[0_15px_40px_-5px_rgba(236,72,153,0.5)]"
               >
                 Edit Profile
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+              </MotionButton>
+              <MotionButton
                 onClick={handleLogout}
-                className="flex-1 rounded-full bg-linear-to-r from-gray-100 to-gray-200 px-6 py-3 font-semibold text-gray-700 shadow-md ring-1 ring-gray-300/50 transition-all duration-200 ease-out hover:shadow-lg"
+                variant="secondary"
+                className="flex-1"
               >
                 Logout
-              </motion.button>
+              </MotionButton>
             </div>
           </motion.div>
         ) : (
@@ -238,78 +247,88 @@ export default function Profile() {
                   </motion.div>
                 )}
 
-                <div>
-                  <label
-                    htmlFor="name"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Name
-                  </label>
-                  <input
-                    id="name"
-                    type="text"
-                    required
-                    value={formData.name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, name: e.target.value })
-                    }
-                    className="mt-1 block w-full rounded-lg border-0 bg-white/60 px-4 py-3 text-gray-900 shadow-sm ring-1 ring-zinc-950/10 transition-all duration-200 ring-inset placeholder:text-gray-400 focus:bg-white focus:ring-2 focus:ring-pink-500 focus:outline-none"
-                  />
-                </div>
+                <FormInput
+                  id="name"
+                  label="Name"
+                  type="text"
+                  required
+                  value={formData.name}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
+                />
 
-                <div>
-                  <label
-                    htmlFor="age"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Age
-                  </label>
-                  <input
-                    id="age"
-                    type="number"
-                    required
-                    min="18"
-                    max="100"
-                    value={formData.age}
-                    onChange={(e) =>
-                      setFormData({ ...formData, age: e.target.value })
-                    }
-                    className="mt-1 block w-full rounded-lg border-0 bg-white/60 px-4 py-3 text-gray-900 shadow-sm ring-1 ring-zinc-950/10 transition-all duration-200 ring-inset placeholder:text-gray-400 focus:bg-white focus:ring-2 focus:ring-pink-500 focus:outline-none"
-                  />
-                </div>
+                <FormInput
+                  id="age"
+                  label="Age"
+                  type="number"
+                  required
+                  min="18"
+                  max="100"
+                  value={formData.age}
+                  onChange={(e) =>
+                    setFormData({ ...formData, age: e.target.value })
+                  }
+                />
 
-                <div>
-                  <label
-                    htmlFor="bio"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Bio
-                  </label>
-                  <textarea
-                    id="bio"
-                    required
-                    rows={4}
-                    value={formData.bio}
-                    onChange={(e) =>
-                      setFormData({ ...formData, bio: e.target.value })
+                <FormSelect
+                  id="province"
+                  label={
+                    <>
+                      Province <span className="text-gray-400">(optional)</span>
+                    </>
+                  }
+                  value={formData.province}
+                  onValueChange={(value) => {
+                    setFormData({ ...formData, province: value, city: '' });
+                  }}
+                  options={getAllProvinces().map((province) => ({ 
+                    value: province, 
+                    label: province 
+                  }))}
+                  placeholder="Select province..."
+                />
+
+                {formData.province && (
+                  <FormSelect
+                    id="city"
+                    label={
+                      <>
+                        City <span className="text-gray-400">(optional)</span>
+                      </>
                     }
-                    className="mt-1 block w-full resize-none rounded-lg border-0 bg-white/60 px-4 py-3 text-gray-900 shadow-sm ring-1 ring-zinc-950/10 transition-all duration-200 ring-inset placeholder:text-gray-400 focus:bg-white focus:ring-2 focus:ring-pink-500 focus:outline-none"
+                    value={formData.city}
+                    onValueChange={(value) =>
+                      setFormData({ ...formData, city: value })
+                    }
+                    options={getCitiesByProvince(formData.province).map((city) => ({ 
+                      value: city, 
+                      label: city 
+                    }))}
+                    placeholder="Select city..."
                   />
-                </div>
+                )}
+
+                <FormTextarea
+                  id="bio"
+                  label="Bio"
+                  required
+                  rows={4}
+                  value={formData.bio}
+                  onChange={(e) =>
+                    setFormData({ ...formData, bio: e.target.value })
+                  }
+                />
 
                 <div className="flex gap-3 pt-2">
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+                  <MotionButton
                     type="submit"
                     disabled={saving}
-                    className="flex-1 rounded-full bg-linear-to-r from-pink-500 to-pink-600 px-6 py-3 font-semibold text-white shadow-[0_10px_30px_-5px_rgba(236,72,153,0.4)] ring-1 ring-pink-600/20 transition-all duration-200 ease-out hover:shadow-[0_15px_40px_-5px_rgba(236,72,153,0.5)] disabled:cursor-not-allowed disabled:opacity-50"
+                    className="flex-1 bg-linear-to-r from-pink-500 to-pink-600 shadow-[0_10px_30px_-5px_rgba(236,72,153,0.4)] hover:shadow-[0_15px_40px_-5px_rgba(236,72,153,0.5)]"
                   >
                     {saving ? 'Saving...' : 'Save Changes'}
-                  </motion.button>
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+                  </MotionButton>
+                  <MotionButton
                     type="button"
                     onClick={() => {
                       setEditing(false);
@@ -317,12 +336,15 @@ export default function Profile() {
                         name: profile.name,
                         age: profile.age.toString(),
                         bio: profile.bio,
+                        province: profile.province || '',
+                        city: profile.city || '',
                       });
                     }}
-                    className="flex-1 rounded-full bg-linear-to-r from-gray-100 to-gray-200 px-6 py-3 font-semibold text-gray-700 shadow-md ring-1 ring-gray-300/50 transition-all duration-200 ease-out hover:shadow-lg"
+                    variant="secondary"
+                    className="flex-1"
                   >
                     Cancel
-                  </motion.button>
+                  </MotionButton>
                 </div>
               </form>
             </motion.div>

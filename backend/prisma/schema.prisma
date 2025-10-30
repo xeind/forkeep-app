@@ -1,12 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
-  // output   = "../generated/prisma"
 }
 
 datasource db {
@@ -14,56 +7,16 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id           String   @id @default(uuid())
-  email        String   @unique
-  passwordHash String
-  name         String
-  age          Int
-  gender       String
-  lookingFor   String
-  bio          String
-  photoUrl     String
-  photos       String[]
-  location     String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  sentSwipes     Swipe[] @relation("SwipeSender")
-  receivedSwipes Swipe[] @relation("SwipeReceiver")
-
-  matchesAsUser1 Match[] @relation("User1Matches")
-  matchesAsUser2 Match[] @relation("User2Matches")
-
-  sentMessages Message[] @relation("MessageSender")
-  receivedMessages Message[] @relation("MessageReceiver")
-
-  @@index([gender, lookingFor])
-}
-
-model Swipe {
-  id        String   @id @default(uuid())
-  swiperId  String
-  swiper    User     @relation("SwipeSender", fields: [swiperId], references: [id], onDelete: Cascade)
-  swipedId  String
-  swiped    User     @relation("SwipeReceiver", fields: [swipedId], references: [id], onDelete: Cascade)
-  direction String
-  createdAt DateTime @default(now())
-
-  @@unique([swiperId, swipedId])
-  @@index([swiperId])
-  @@index([swipedId])
-}
-
 model Match {
-  id String @id @default(uuid())
-  user1Id String
-  user1 User @relation("User1Matches", fields: [user1Id], references: [id], onDelete: Cascade)
-  user2Id String
-  user2 User @relation("User2Matches", fields: [user2Id], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  messages Message[]
+  id            String    @id
+  user1Id       String
+  user2Id       String
+  createdAt     DateTime  @default(now())
+  viewedByUser1 Boolean   @default(false)
+  viewedByUser2 Boolean   @default(false)
+  user1         User      @relation("Match_user1IdToUser", fields: [user1Id], references: [id], onDelete: Cascade)
+  user2         User      @relation("Match_user2IdToUser", fields: [user2Id], references: [id], onDelete: Cascade)
+  messages      Message[]
 
   @@unique([user1Id, user2Id])
   @@index([user1Id])
@@ -71,19 +24,57 @@ model Match {
 }
 
 model Message {
-  id String @id @default(uuid())
-  matchId String
-  match Match @relation(fields: [matchId], references: [id], onDelete: Cascade)
-  senderId String
-  sender User @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade) 
+  id         String   @id
+  matchId    String
+  senderId   String
   receiverId String
-  receiver User @relation("MessageReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
-  content String
-  read Boolean @default(false)
-  createdAt DateTime @default(now())
+  content    String
+  read       Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  match      Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  receiver   User     @relation("Message_receiverIdToUser", fields: [receiverId], references: [id], onDelete: Cascade)
+  sender     User     @relation("Message_senderIdToUser", fields: [senderId], references: [id], onDelete: Cascade)
 
   @@index([matchId])
-  @@index([senderId])
   @@index([receiverId])
+  @@index([senderId])
+}
 
+model Swipe {
+  id        String   @id
+  swiperId  String
+  swipedId  String
+  direction String
+  createdAt DateTime @default(now())
+  swiped    User     @relation("Swipe_swipedIdToUser", fields: [swipedId], references: [id], onDelete: Cascade)
+  swiper    User     @relation("Swipe_swiperIdToUser", fields: [swiperId], references: [id], onDelete: Cascade)
+
+  @@unique([swiperId, swipedId])
+  @@index([swipedId])
+  @@index([swiperId])
+}
+
+model User {
+  id               String    @id
+  email            String    @unique
+  passwordHash     String
+  name             String
+  age              Int
+  gender           String
+  lookingFor       String
+  bio              String
+  photoUrl         String
+  photos           String[]
+  province         String?
+  city             String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime
+  matchesAsUser1   Match[]   @relation("Match_user1IdToUser")
+  matchesAsUser2   Match[]   @relation("Match_user2IdToUser")
+  messagesReceived Message[] @relation("Message_receiverIdToUser")
+  messagesSent     Message[] @relation("Message_senderIdToUser")
+  swipesReceived   Swipe[]   @relation("Swipe_swipedIdToUser")
+  swipesMade       Swipe[]   @relation("Swipe_swiperIdToUser")
+
+  @@index([gender, lookingFor])
 }

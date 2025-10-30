@@ -12,7 +12,8 @@ interface UserProfile {
   gender: string;
   bio: string;
   photoUrl: string;
-  location?: string;
+  province?: string | null;
+  city?: string | null;
   lookingFor: string;
 }
 
@@ -153,7 +154,7 @@ export default function UserProfile() {
 
               <p className="mt-2 text-sm text-gray-600">{profile.bio}</p>
 
-              {profile.location && (
+              {(profile.city || profile.province) && (
                 <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-linear-to-r from-pink-50 to-purple-50 px-3 py-1.5">
                   <svg
                     className="h-3.5 w-3.5 text-pink-500"
@@ -167,7 +168,7 @@ export default function UserProfile() {
                     />
                   </svg>
                   <span className="text-xs font-medium text-gray-600">
-                    {profile.location}
+                    {profile.city && profile.province ? `${profile.city}, ${profile.province}` : profile.city || profile.province}
                   </span>
                 </div>
               )}

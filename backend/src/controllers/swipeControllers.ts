@@ -1,5 +1,6 @@
 import prisma from '../prisma';
 import type { Request, Response } from 'express';
+import { v4 as uuidv4 } from 'uuid';
 
 export const createSwipe = async (req: Request, res: Response) => {
   try {
@@ -42,6 +43,7 @@ export const createSwipe = async (req: Request, res: Response) => {
     // Create Swipe Record
     await prisma.swipe.create({
       data: {
+        id: uuidv4(),
         swiperId: userId,
         swipedId: swipedUserId,
         direction: direction,
@@ -65,6 +67,7 @@ export const createSwipe = async (req: Request, res: Response) => {
         try {
           const match = await prisma.match.create({
             data: {
+              id: uuidv4(),
               user1Id,
               user2Id,
             },

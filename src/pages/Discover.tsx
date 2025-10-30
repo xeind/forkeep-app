@@ -4,24 +4,28 @@ import SwipeCard from '../components/matching/SwipeCard';
 import MatchModal from '../components/MatchModal';
 import LoadingState from '../components/common/LoadingState';
 import EmptyState from '../components/common/EmptyState';
-import { api, type User } from '../lib/api';
+import { api, type User, type Match } from '../lib/api';
 
 export default function Discover() {
   const [users, setUsers] = useState<User[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [matchedUser, setMatchedUser] = useState<User | null>(null);
+  const [matchId, setMatchId] = useState<string | null>(null);
   const [imagesLoaded, setImagesLoaded] = useState(false);
   const [exitingCard, setExitingCard] = useState<{ id: string; direction: 'left' | 'right' } | null>(null);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
   const [fetchingMore, setFetchingMore] = useState(false);
   const [swiping, setSwiping] = useState(false);
+  const [unviewedMatches, setUnviewedMatches] = useState<Match[]>([]);
+  const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
 
   const BATCH_SIZE = 10;
   const FETCH_THRESHOLD = 3;
 
   useEffect(() => {
+    checkUnviewedMatches();
     fetchUsers();
   }, []);
 
@@ -88,6 +92,18 @@ export default function Discover() {
     }
   };
 
+  const checkUnviewedMatches = async () => {
+    try {
+      const { matches } = await api.matches.unviewed();
+      if (matches.length > 0) {
+        setUnviewedMatches(matches);
+        setCurrentMatchIndex(0);
+      }
+    } catch (error) {
+      console.error('Failed to fetch unviewed matches:', error);
+    }
+  };
+
   const fetchUsers = async () => {
     try {
       setLoading(true);
@@ -126,21 +142,21 @@ export default function Discover() {
     console.log(`Swiped ${direction} on ${currentUser.name}`);
 
     setSwiping(true);
+    setExitingCard({ id: currentUser.id, direction });
 
     try {
       const result = await api.swipes.create(currentUser.id, direction);
       console.log('Swipe result:', result);
 
-      if (result.match) {
+      if (result.match && result.matchId) {
         console.log('🎉 MATCH DETECTED! Setting matchedUser:', currentUser);
         setMatchedUser(currentUser);
+        setMatchId(result.matchId);
       }
 
-      setExitingCard({ id: currentUser.id, direction });
       setCurrentIndex((prev) => prev + 1);
     } catch (error) {
       console.error('Swipe failed:', error);
-      setExitingCard({ id: currentUser.id, direction });
       setCurrentIndex((prev) => prev + 1);
     } finally {
       setSwiping(false);
@@ -151,59 +167,86 @@ export default function Discover() {
 
   const closeMatchModal = () => {
     setMatchedUser(null);
+    setMatchId(null);
+  };
+
+  const closeUnviewedMatchModal = () => {
+    if (currentMatchIndex < unviewedMatches.length - 1) {
+      setCurrentMatchIndex(currentMatchIndex + 1);
+    } else {
+      setUnviewedMatches([]);
+    }
   };
 
   if (loading || !imagesLoaded) {
     return <LoadingState message="Loading profiles..." />;
   }
 
-  if (users.length === 0 || currentIndex >= users.length) {
-    return (
-      <EmptyState
-        title="No more profiles for today!"
-        message="Check back later for more matches"
-        action={{
-          label: 'Refresh',
-          onClick: () => {
-            setCurrentIndex(0);
-            setImagesLoaded(false);
-            fetchUsers();
-          },
-        }}
-      />
-    );
-  }
-
+  const showEmptyState = (users.length === 0 || currentIndex >= users.length) && !matchedUser;
   const currentUser = users[currentIndex];
   const nextUser =
     currentIndex + 1 < users.length ? users[currentIndex + 1] : null;
 
   return (
-    <div className="flex h-screen items-center justify-center">
-      <div className="relative h-[600px] w-96">
-        {nextUser && (
-          <SwipeCard user={nextUser} onSwipe={() => {}} isBackground />
-        )}
-
-        <AnimatePresence mode="popLayout" onExitComplete={() => setExitingCard(null)}>
-          <SwipeCard
-            key={currentUser.id}
-            user={currentUser}
-            onSwipe={handleSwipe}
-            onExitComplete={handleExitComplete}
-            exitDirection={exitingCard?.id === currentUser.id ? exitingCard.direction : null}
+    <>
+      <div className="flex h-screen items-center justify-center">
+        {showEmptyState ? (
+          <EmptyState
+            title="No more profiles for today!"
+            message="Check back later for more matches"
+            action={{
+              label: 'Refresh',
+              onClick: () => {
+                setCurrentIndex(0);
+                setImagesLoaded(false);
+                fetchUsers();
+              },
+            }}
           />
-        </AnimatePresence>
+        ) : (
+          currentUser && (
+            <div className="relative h-[600px] w-96">
+              <AnimatePresence mode="popLayout">
+                {nextUser && (
+                  <SwipeCard key={nextUser.id} user={nextUser} onSwipe={() => {}} isBackground />
+                )}
+
+                <SwipeCard
+                  key={currentUser.id}
+                  user={currentUser}
+                  onSwipe={handleSwipe}
+                  onExitComplete={handleExitComplete}
+                  exitDirection={exitingCard?.id === currentUser.id ? exitingCard.direction : null}
+                />
+              </AnimatePresence>
+            </div>
+          )
+        )}
       </div>
 
-      {matchedUser && (
+      {unviewedMatches.length > 0 && unviewedMatches[currentMatchIndex] && (
+        <MatchModal
+          userName={unviewedMatches[currentMatchIndex].matchedUser.name}
+          userPhoto={unviewedMatches[currentMatchIndex].matchedUser.photoUrl}
+          userId={unviewedMatches[currentMatchIndex].matchedUser.id}
+          matchId={unviewedMatches[currentMatchIndex].id}
+          onClose={closeUnviewedMatchModal}
+          currentIndex={currentMatchIndex}
+          totalMatches={unviewedMatches.length}
+          isUnviewedCarousel={true}
+          allMatchIds={unviewedMatches.map(m => m.id)}
+        />
+      )}
+
+      {matchedUser && matchId && (
         <MatchModal
           userName={matchedUser.name}
           userPhoto={matchedUser.photoUrl}
           userId={matchedUser.id}
+          matchId={matchId}
           onClose={closeMatchModal}
         />
       )}
-    </div>
+    </>
   );
 }

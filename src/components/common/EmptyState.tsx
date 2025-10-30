@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
 import { type ReactNode } from 'react';
+import { MotionButton } from '@/components/MotionButton';
 
 interface EmptyStateProps {
   icon?: ReactNode;
@@ -11,7 +12,12 @@ interface EmptyStateProps {
   };
 }
 
-export default function EmptyState({ icon, title, message, action }: EmptyStateProps) {
+export default function EmptyState({
+  icon,
+  title,
+  message,
+  action,
+}: EmptyStateProps) {
   return (
     <div className="flex h-screen items-center justify-center">
       <motion.div
@@ -40,14 +46,12 @@ export default function EmptyState({ icon, title, message, action }: EmptyStateP
         <h2 className="text-2xl font-bold text-gray-800">{title}</h2>
         <p className="mt-2 text-gray-600">{message}</p>
         {action && (
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+          <MotionButton
             onClick={action.onClick}
-            className="mt-6 rounded-full bg-pink-500 px-6 py-3 font-medium text-white shadow-md ring-1 ring-pink-600/20 transition-all duration-200 ease-out hover:bg-pink-600 hover:shadow-lg"
+            className="mt-6 bg-pink-500 hover:bg-pink-600"
           >
             {action.label}
-          </motion.button>
+          </MotionButton>
         )}
       </motion.div>
     </div>

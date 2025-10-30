@@ -1,5 +1,6 @@
 import prisma from '../prisma';
 import type { Request, Response } from 'express';
+import { v4 as uuidv4 } from 'uuid';
 
 export const sendMessage = async (req: Request, res: Response) => {
   try {
@@ -39,6 +40,7 @@ export const sendMessage = async (req: Request, res: Response) => {
     // Creating the message
     const message = await prisma.message.create({
       data: {
+        id: uuidv4(),
         matchId: matchId,
         senderId: userId,
         receiverId: receiverId,

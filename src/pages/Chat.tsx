@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { api, type Message, type Match } from '../lib/api';
 import { getCurrentUserId } from '../utils/auth';
 import LoadingState from '../components/common/LoadingState';
-import Input from '../components/common/Input';
+import FormInput from '@/components/FormInput';
 
 export default function Chat() {
   const { matchId } = useParams<{ matchId: string }>();
@@ -114,7 +114,10 @@ export default function Chat() {
                   {matchInfo.matchedUser.name}
                 </h2>
                 <p className="text-xs text-gray-500">
-                  {matchInfo.matchedUser.age} • {matchInfo.matchedUser.location}
+                  {matchInfo.matchedUser.age}
+                  {(matchInfo.matchedUser.city || matchInfo.matchedUser.province) && (
+                    <> • {matchInfo.matchedUser.city && matchInfo.matchedUser.province ? `${matchInfo.matchedUser.city}, ${matchInfo.matchedUser.province}` : matchInfo.matchedUser.city || matchInfo.matchedUser.province}</>
+                  )}
                 </p>
               </div>
             </div>
@@ -171,7 +174,7 @@ export default function Chat() {
           onSubmit={handleSendMessage}
           className="mx-auto flex max-w-4xl items-center gap-2"
         >
-          <Input
+          <FormInput
             type="text"
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}

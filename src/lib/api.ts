@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:3001';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 export interface User {
   id: string;
@@ -8,7 +8,8 @@ export interface User {
   bio: string;
   photoUrl: string;
   photos?: string[];
-  location?: string;
+  province?: string | null;
+  city?: string | null;
 }
 
 export interface Match {
@@ -98,6 +99,9 @@ export const api = {
       lookingFor: string;
       bio: string;
       photoUrl: string;
+      province?: string;
+      city?: string;
+      photos?: string[];
     }) => {
       const data = await authFetch('/api/auth/signup', {
         method: 'POST',
@@ -138,6 +142,16 @@ export const api = {
   matches: {
     list: async (): Promise<{ matches: Match[] }> => {
       return authFetch('/api/matches');
+    },
+
+    unviewed: async (): Promise<{ matches: Match[] }> => {
+      return authFetch('/api/matches/unviewed');
+    },
+
+    markAsViewed: async (matchId: string): Promise<{ success: boolean }> => {
+      return authFetch(`/api/matches/${matchId}/view`, {
+        method: 'POST',
+      });
     },
 
     delete: async (matchId: string): Promise<{ success: boolean }> => {

@@ -149,7 +149,7 @@ export default function Matches() {
                   <p className="mt-1 line-clamp-2 text-sm text-gray-600">
                     {match.matchedUser.bio}
                   </p>
-                  {match.matchedUser.location && (
+                  {(match.matchedUser.city || match.matchedUser.province) && (
                     <div className="mt-2 inline-flex items-center gap-1 rounded-full bg-linear-to-r from-pink-50 to-purple-50 px-2.5 py-1 text-xs font-medium text-gray-600">
                       <svg
                         className="h-3 w-3 text-pink-500"
@@ -162,7 +162,9 @@ export default function Matches() {
                           clipRule="evenodd"
                         />
                       </svg>
-                      {match.matchedUser.location}
+                      {[match.matchedUser.city, match.matchedUser.province]
+                        .filter(Boolean)
+                        .join(', ')}
                     </div>
                   )}
                 </div>

@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import './index.css';
 import Login from './pages/Login.tsx';
-import Signup from './pages/Signup.tsx';
+import SignupWizard from './pages/SignupWizard.tsx';
 import Discover from './pages/Discover.tsx';
 import Matches from './pages/Matches.tsx';
 import Chat from './pages/Chat.tsx';
@@ -39,7 +39,7 @@ function AppRoutes() {
       {showNavbar && <Navbar />}
       <Routes>
         <Route path="/" element={<GuestRoute><Login /></GuestRoute>} />
-        <Route path="/signup" element={<GuestRoute><Signup /></GuestRoute>} />
+        <Route path="/signup" element={<GuestRoute><SignupWizard /></GuestRoute>} />
         <Route
           path="/discover"
           element={

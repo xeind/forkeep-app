@@ -29,7 +29,7 @@ export default function ProfileCard({ user }: ProfileCardProps) {
 
         <p className="text-sm leading-relaxed text-gray-600">{user.bio}</p>
 
-        {user.location && (
+        {(user.city || user.province) && (
           <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-linear-to-r from-pink-50 to-purple-50 px-3 py-1.5 text-xs font-medium text-gray-700 ring-1 ring-pink-200/50">
             <svg
               className="h-3.5 w-3.5 text-pink-500"
@@ -42,7 +42,7 @@ export default function ProfileCard({ user }: ProfileCardProps) {
                 clipRule="evenodd"
               />
             </svg>
-            {user.location}
+            {user.city && user.province ? `${user.city}, ${user.province}` : user.city || user.province}
           </div>
         )}
 

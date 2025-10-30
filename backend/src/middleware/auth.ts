@@ -1,11 +1,12 @@
 import jwt from 'jsonwebtoken';
 import type { Request, Response, NextFunction } from 'express';
 
-// Extend Express Request type to include userId
+// Extend Express Request type to include userId and shuffleSeed
 declare global {
   namespace Express {
     interface Request {
       userId?: string;
+      shuffleSeed?: number;
     }
   }
 }
@@ -30,8 +31,10 @@ export default function authMiddleware(
 
     const payload = jwt.verify(token, process.env.JWT_SECRET!) as {
       userId: string;
+      shuffleSeed?: number;
     };
     req.userId = payload.userId;
+    req.shuffleSeed = payload.shuffleSeed;
     next();
   } catch (error) {
     return res.status(401).json({ error: 'Invalid or expired token' });

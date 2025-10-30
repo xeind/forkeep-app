@@ -43,8 +43,15 @@ export default function SwipeCard({
   if (isBackground) {
     return (
       <motion.div
-        initial={{ scale: 0.95, opacity: 0.8 }}
+        initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 0.95, opacity: 0.8 }}
+        transition={{
+          type: 'spring',
+          stiffness: 120,
+          damping: 20,
+          mass: 0.8,
+          duration: 0.6,
+        }}
         className="pointer-events-none absolute inset-0"
       >
         <ProfileCard user={user} />
@@ -52,7 +59,14 @@ export default function SwipeCard({
     );
   }
 
-  const exitX = exitDirection === 'right' ? 1000 : exitDirection === 'left' ? -1000 : x.get() > 0 ? 1000 : -1000;
+  const exitX =
+    exitDirection === 'right'
+      ? 1000
+      : exitDirection === 'left'
+        ? -1000
+        : x.get() > 0
+          ? 1000
+          : -1000;
 
   return (
     <motion.div
@@ -79,19 +93,22 @@ export default function SwipeCard({
       }}
       whileDrag={{ scale: 1.05 }}
       transition={{
-        duration: 0.25,
-        ease: [0.215, 0.61, 0.355, 1],
+        type: 'spring',
+        stiffness: 120,
+        damping: 20,
+        mass: 0.8,
+        duration: 0.6,
       }}
     >
       <div className="relative h-full w-full">
         <motion.div
           style={{ opacity: likeOpacity }}
-          className="absolute -inset-1 rounded-[28px] bg-green-500/40 blur-xl pointer-events-none"
+          className="pointer-events-none absolute -inset-1 rounded-[28px] bg-green-500/40 blur-xl"
         />
 
         <motion.div
           style={{ opacity: nopeOpacity }}
-          className="absolute -inset-1 rounded-[28px] bg-red-500/40 blur-xl pointer-events-none"
+          className="pointer-events-none absolute -inset-1 rounded-[28px] bg-red-500/40 blur-xl"
         />
 
         <ProfileCard user={user} />
@@ -99,14 +116,14 @@ export default function SwipeCard({
 
       <motion.div
         style={{ opacity: nopeOpacity }}
-        className="pointer-events-none absolute inset-0 rounded-3xl overflow-hidden"
+        className="pointer-events-none absolute inset-0 overflow-hidden rounded-3xl"
       >
         <div className="absolute inset-y-0 left-0 w-64 bg-linear-to-r from-red-600/30 to-transparent" />
       </motion.div>
 
       <motion.div
         style={{ opacity: likeOpacity }}
-        className="pointer-events-none absolute inset-0 rounded-3xl overflow-hidden"
+        className="pointer-events-none absolute inset-0 overflow-hidden rounded-3xl"
       >
         <div className="absolute inset-y-0 right-0 w-64 bg-linear-to-l from-green-700/30 to-transparent" />
       </motion.div>
@@ -122,7 +139,9 @@ export default function SwipeCard({
         style={{ opacity: likeOpacity }}
         className="pointer-events-none absolute top-10 right-10 rotate-12 rounded-xl border-4 border-green-500 px-6 py-3 shadow-[0_0_30px_rgba(34,197,94,0.6)]"
       >
-        <span className="text-5xl font-bold text-green-500 drop-shadow-[0_0_20px_rgba(34,197,94,0.8)]">LIKE</span>
+        <span className="text-5xl font-bold text-green-500 drop-shadow-[0_0_20px_rgba(34,197,94,0.8)]">
+          LIKE
+        </span>
       </motion.div>
     </motion.div>
   );
