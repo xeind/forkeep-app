@@ -11,6 +11,7 @@ import { MotionButton } from '@/components/MotionButton';
 import FormInput from '@/components/FormInput';
 import FormTextarea from '@/components/FormTextarea';
 import FormSelect from '@/components/FormSelect';
+import { ProfileCardFront, ProfileCardBack } from '@/components/ProfileCard';
 
 interface UserProfile {
   id: string;
@@ -31,6 +32,7 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [isFlipped, setIsFlipped] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     age: '',
@@ -100,6 +102,12 @@ export default function Profile() {
     navigate('/');
   };
 
+  const handleCardClick = () => {
+    if (!editing) {
+      setIsFlipped(!isFlipped);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -141,85 +149,71 @@ export default function Profile() {
           >
             <div className="relative h-[600px] w-96">
               <motion.div
-                layout
-                className="absolute h-[600px] w-96 overflow-hidden rounded-3xl bg-white shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] ring-1 ring-zinc-950/10"
+                onClick={handleCardClick}
+                className="absolute inset-0 cursor-pointer"
+                style={{
+                  perspective: '1000px',
+                }}
               >
-                <div className="relative h-64 w-full overflow-hidden">
-                  <img
-                    src={profile.photoUrl}
-                    alt={profile.name}
-                    className="h-full w-full object-cover"
-                    draggable={false}
-                  />
-                  <div className="absolute inset-0 bg-linear-to-t from-black/20" />
-                </div>
-                <div className="p-6">
-                  <div className="flex justify-between">
-                    <h2 className="bg-linear-to-r from-gray-900 to-gray-700 bg-clip-text text-2xl font-bold text-transparent">
-                      {profile.name}
-                    </h2>
-                    <h2 className="text-2xl font-bold text-gray-900">
-                      {profile.age}
-                    </h2>
+                <motion.div
+                  animate={{
+                    rotateY: isFlipped ? 180 : 0,
+                  }}
+                  transition={{
+                    duration: 0.6,
+                    ease: [0.785, 0.135, 0.15, 0.86],
+                  }}
+                  style={{
+                    transformStyle: 'preserve-3d',
+                    position: 'relative',
+                    width: '100%',
+                    height: '100%',
+                  }}
+                >
+                  <div
+                    style={{
+                      backfaceVisibility: 'hidden',
+                      transform: 'translateZ(0px)',
+                      width: '100%',
+                      height: '100%',
+                    }}
+                  >
+                    <ProfileCardFront user={profile} />
                   </div>
 
-                  <p className="mt-2 text-sm text-gray-600">{profile.bio}</p>
-
-                  {(profile.city || profile.province) && (
-                    <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-linear-to-r from-pink-50 to-purple-50 px-3 py-1.5">
-                      <svg
-                        className="h-3.5 w-3.5 text-pink-500"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                      <span className="text-xs font-medium text-gray-600">
-                        {profile.city && profile.province
-                          ? `${profile.city}, ${profile.province}`
-                          : profile.city || profile.province}
-                      </span>
-                    </div>
-                  )}
-
-                  <div className="mt-6 space-y-2">
-                    <div className="flex items-center gap-2 rounded-xl bg-linear-to-r from-gray-50 to-gray-100 px-4 py-3">
-                      <span className="text-sm font-semibold text-gray-700">
-                        Gender:
-                      </span>
-                      <span className="text-sm text-gray-900">
-                        {profile.gender}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2 rounded-xl bg-linear-to-r from-gray-50 to-gray-100 px-4 py-3">
-                      <span className="text-sm font-semibold text-gray-700">
-                        Looking for:
-                      </span>
-                      <span className="text-sm text-gray-900">
-                        {profile.lookingFor}
-                      </span>
-                    </div>
+                  <div
+                    style={{
+                      backfaceVisibility: 'hidden',
+                      position: 'absolute',
+                      inset: 0,
+                      transform: 'rotateY(180deg) translateZ(0px)',
+                      width: '100%',
+                      height: '100%',
+                    }}
+                  >
+                    <ProfileCardBack user={profile} />
                   </div>
-                </div>
+                </motion.div>
               </motion.div>
             </div>
 
             <div className="flex w-96 gap-3">
               <MotionButton
-                onClick={() => setEditing(true)}
+                onClick={() => {
+                  setEditing(true);
+                  setIsFlipped(false);
+                }}
                 gradientStyle="brand"
                 className="flex-1"
+                size="default"
               >
                 Edit Profile
               </MotionButton>
               <MotionButton
                 onClick={handleLogout}
-                variant="secondary"
+                gradientStyle="brand"
                 className="flex-1"
+                size="default"
               >
                 Logout
               </MotionButton>
@@ -349,7 +343,7 @@ export default function Profile() {
                         city: profile.city || '',
                       });
                     }}
-                    variant="secondary"
+                    gradientStyle="brand"
                     className="flex-1"
                   >
                     Cancel

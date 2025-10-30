@@ -58,7 +58,7 @@ const MotionButton = forwardRef<HTMLButtonElement, MotionButtonProps>(
         whileHover={!disabled && enableHover ? { scale: 1.02 } : {}}
         whileTap={!disabled && enableTap ? { scale: 0.98 } : {}}
         transition={{ duration: 0.2, ease: [0.215, 0.61, 0.355, 1] }}
-        style={{ display: 'inline-block' }}
+        style={{ display: 'inline-block', borderRadius: 'inherit' }}
       >
         <Button
           ref={ref}

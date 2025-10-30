@@ -12,7 +12,7 @@ function Navbar() {
 
   return (
     <nav
-      className="fixed left-6 z-40 flex flex-col gap-2 rounded-3xl bg-white/80 p-3 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] ring-1 ring-zinc-950/10 backdrop-blur-xl"
+      className="fixed left-6 z-40 flex flex-col gap-2 rounded-3xl bg-white/80 p-3 shadow-[0px_0px_1px_1px_rgba(255,255,255,0.08)_inset,0px_1px_1.5px_0px_rgba(0,0,0,0.32),0px_0px_0px_0.5px_rgba(0,0,0,0.1)] backdrop-blur-xl"
       style={{
         top: '50%',
         transform: 'translate3d(0, -50%, 0)',
@@ -31,7 +31,7 @@ function Navbar() {
         {isActive('/discover') && (
           <motion.div
             layoutId="navGlow"
-            className="absolute inset-0 rounded-xl bg-linear-to-br from-pink-500 to-pink-600 shadow-[0_10px_20px_-5px_rgba(236,72,153,0.3)] ring-1 ring-zinc-100"
+            className="absolute inset-0 rounded-xl bg-linear-to-b from-[#FB64B6] to-[#E60076] shadow-[0px_0px_1px_1px_rgba(255,255,255,0.08)_inset,0px_1px_1.5px_0px_rgba(0,0,0,0.32),0px_0px_0px_0.5px_#ec4899]"
             transition={{
               duration: 0.25,
               ease: [0.215, 0.61, 0.355, 1],
@@ -65,7 +65,7 @@ function Navbar() {
         {isActive('/matches') && (
           <motion.div
             layoutId="navGlow"
-            className="absolute inset-0 rounded-xl bg-linear-to-br from-pink-500 to-pink-600 shadow-[0_10px_20px_-5px_rgba(236,72,153,0.3)] ring-1 ring-zinc-100"
+            className="absolute inset-0 rounded-xl bg-linear-to-b from-[#FB64B6] to-[#E60076] shadow-[0px_0px_1px_1px_rgba(255,255,255,0.08)_inset,0px_1px_1.5px_0px_rgba(0,0,0,0.32),0px_0px_0px_0.5px_#ec4899]"
             transition={{
               duration: 0.25,
               ease: [0.215, 0.61, 0.355, 1],
@@ -99,7 +99,7 @@ function Navbar() {
         {isActive('/profile') && (
           <motion.div
             layoutId="navGlow"
-            className="absolute inset-0 rounded-xl bg-linear-to-br from-pink-500 to-pink-600 shadow-[0_10px_20px_-5px_rgba(236,72,153,0.3)] ring-1 ring-zinc-100"
+            className="absolute inset-0 rounded-xl bg-linear-to-b from-[#FB64B6] to-[#E60076] shadow-[0px_0px_1px_1px_rgba(255,255,255,0.08)_inset,0px_1px_1.5px_0px_rgba(0,0,0,0.32),0px_0px_0px_0.5px_#ec4899]"
             transition={{
               duration: 0.25,
               ease: [0.215, 0.61, 0.355, 1],
@@ -135,7 +135,7 @@ function Navbar() {
         {isActive('/settings') && (
           <motion.div
             layoutId="navGlow"
-            className="absolute inset-0 rounded-xl bg-linear-to-br from-pink-500 to-pink-600 shadow-[0_10px_20px_-5px_rgba(236,72,153,0.3)] ring-1 ring-zinc-100"
+            className="absolute inset-0 rounded-xl bg-linear-to-b from-[#FB64B6] to-[#E60076] shadow-[0px_0px_1px_1px_rgba(255,255,255,0.08)_inset,0px_1px_1.5px_0px_rgba(0,0,0,0.32),0px_0px_0px_0.5px_#ec4899]"
             transition={{
               duration: 0.25,
               ease: [0.215, 0.61, 0.355, 1],

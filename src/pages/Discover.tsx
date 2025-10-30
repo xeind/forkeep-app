@@ -13,6 +13,7 @@ export default function Discover() {
   const [matchedUser, setMatchedUser] = useState<User | null>(null);
   const [matchId, setMatchId] = useState<string | null>(null);
   const [imagesLoaded, setImagesLoaded] = useState(false);
+  const [initialLoad, setInitialLoad] = useState(true);
   const [exitingCard, setExitingCard] = useState<{
     id: string;
     direction: 'left' | 'right';
@@ -23,6 +24,7 @@ export default function Discover() {
   const [swiping, setSwiping] = useState(false);
   const [unviewedMatches, setUnviewedMatches] = useState<Match[]>([]);
   const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
+  const [isAnimatingLastCard, setIsAnimatingLastCard] = useState(false);
 
   const BATCH_SIZE = 10;
   const FETCH_THRESHOLD = 3;
@@ -37,6 +39,7 @@ export default function Discover() {
       preloadImages();
     } else if (!loading) {
       setImagesLoaded(true);
+      setInitialLoad(false);
     }
   }, [users, loading]);
 
@@ -95,9 +98,11 @@ export default function Discover() {
     try {
       await Promise.all(imagePromises);
       setImagesLoaded(true);
+      setInitialLoad(false);
     } catch (error) {
       console.error('Failed to preload images:', error);
       setImagesLoaded(true);
+      setInitialLoad(false);
     }
   };
 
@@ -147,8 +152,13 @@ export default function Discover() {
     if (swiping) return;
 
     const currentUser = users[currentIndex];
+    const isLastCard = currentIndex === users.length - 1;
 
     console.log(`Swiped ${direction} on ${currentUser.name}`);
+
+    if (isLastCard) {
+      setIsAnimatingLastCard(true);
+    }
 
     setSwiping(true);
     setExitingCard({ id: currentUser.id, direction });
@@ -163,10 +173,21 @@ export default function Discover() {
         setMatchId(result.matchId);
       }
 
-      setCurrentIndex((prev) => prev + 1);
+      // Delay incrementing index to allow exit animation to complete for all cards
+      setTimeout(() => {
+        setCurrentIndex((prev) => prev + 1);
+        if (isLastCard) {
+          setIsAnimatingLastCard(false);
+        }
+      }, 400); // Match the exit animation duration (0.3s + buffer)
     } catch (error) {
       console.error('Swipe failed:', error);
-      setCurrentIndex((prev) => prev + 1);
+      setTimeout(() => {
+        setCurrentIndex((prev) => prev + 1);
+        if (isLastCard) {
+          setIsAnimatingLastCard(false);
+        }
+      }, 400);
     } finally {
       setSwiping(false);
     }
@@ -187,14 +208,17 @@ export default function Discover() {
     }
   };
 
-  if (loading || !imagesLoaded) {
+  // Always show loading state first to prevent any flashing
+  if (loading || !imagesLoaded || initialLoad) {
     return (
       <LoadingState message="Loading profiles..." variant="profile-card" />
     );
   }
 
   const showEmptyState =
-    (users.length === 0 || currentIndex >= users.length) && !matchedUser;
+    (users.length === 0 || currentIndex >= users.length) &&
+    !matchedUser &&
+    !isAnimatingLastCard;
   const currentUser = users[currentIndex];
   const nextUser =
     currentIndex + 1 < users.length ? users[currentIndex + 1] : null;
@@ -211,38 +235,35 @@ export default function Discover() {
               onClick: () => {
                 setCurrentIndex(0);
                 setImagesLoaded(false);
+                setInitialLoad(true);
                 fetchUsers();
               },
             }}
           />
-        ) : (
-          currentUser && (
-            <div className="relative h-[600px] w-96">
-              <AnimatePresence mode="popLayout">
-                {nextUser && (
-                  <SwipeCard
-                    key={nextUser.id}
-                    user={nextUser}
-                    onSwipe={() => {}}
-                    isBackground
-                  />
-                )}
+        ) : currentUser ? (
+          <div className="relative h-[600px] w-96">
+            <AnimatePresence mode="popLayout">
+              <SwipeCard
+                key={nextUser ? nextUser.id : `${currentUser.id}-bg`}
+                user={nextUser || currentUser}
+                onSwipe={() => {}}
+                isBackground
+              />
 
-                <SwipeCard
-                  key={currentUser.id}
-                  user={currentUser}
-                  onSwipe={handleSwipe}
-                  onExitComplete={handleExitComplete}
-                  exitDirection={
-                    exitingCard?.id === currentUser.id
-                      ? exitingCard.direction
-                      : null
-                  }
-                />
-              </AnimatePresence>
-            </div>
-          )
-        )}
+              <SwipeCard
+                key={currentUser.id}
+                user={currentUser}
+                onSwipe={handleSwipe}
+                onExitComplete={handleExitComplete}
+                exitDirection={
+                  exitingCard?.id === currentUser.id
+                    ? exitingCard.direction
+                    : null
+                }
+              />
+            </AnimatePresence>
+          </div>
+        ) : null}
       </div>
 
       {unviewedMatches.length > 0 && unviewedMatches[currentMatchIndex] && (

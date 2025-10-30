@@ -12,11 +12,17 @@ import FormTextarea from '@/components/FormTextarea';
 import FormSelect from '@/components/FormSelect';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, CalendarIcon } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import { format } from 'date-fns';
 
 interface SignupFormData {
   name: string;
+  birthday: Date | undefined;
   age: string;
   province: string;
   city: string;
@@ -42,6 +48,7 @@ export default function SignupWizard() {
 
   const [formData, setFormData] = useState<SignupFormData>({
     name: '',
+    birthday: undefined,
     age: '',
     province: '',
     city: '',
@@ -59,6 +66,11 @@ export default function SignupWizard() {
     setError('');
   };
 
+  const updateBirthday = (date: Date | undefined) => {
+    setFormData((prev) => ({ ...prev, birthday: date }));
+    setError('');
+  };
+
   const validateCurrentStep = (): boolean => {
     setError('');
 
@@ -68,13 +80,13 @@ export default function SignupWizard() {
           setError('Name is required');
           return false;
         }
-        if (!formData.age) {
-          setError('Age is required');
+        if (!formData.birthday) {
+          setError('Birthday is required');
           return false;
         }
         const ageNum = parseInt(formData.age);
-        if (isNaN(ageNum) || ageNum < 18 || ageNum > 100) {
-          setError('Age must be between 18 and 100');
+        if (isNaN(ageNum) || ageNum < 18) {
+          setError('You must be at least 18 years old');
           return false;
         }
         return true;
@@ -248,7 +260,7 @@ export default function SignupWizard() {
                     x: direction === 'forward' ? -26 : 26,
                   }}
                   transition={{
-                    duration: 0.3,
+                    duration: 0.2,
                     ease: [0.645, 0.045, 0.355, 1],
                   }}
                 >
@@ -256,6 +268,7 @@ export default function SignupWizard() {
                     <StepOne
                       formData={formData}
                       updateFormData={updateFormData}
+                      updateBirthday={updateBirthday}
                     />
                   )}
                   {currentStep === 2 && (
@@ -346,6 +359,7 @@ export default function SignupWizard() {
 interface StepProps {
   formData: SignupFormData;
   updateFormData: (field: keyof SignupFormData, value: string) => void;
+  updateBirthday?: (date: Date | undefined) => void;
 }
 
 interface PhotoStepProps {
@@ -354,11 +368,35 @@ interface PhotoStepProps {
   setError: React.Dispatch<React.SetStateAction<string>>;
 }
 
-function StepOne({ formData, updateFormData }: StepProps) {
+function StepOne({ formData, updateFormData, updateBirthday }: StepProps) {
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const provinces = getAllProvinces();
   const cities = formData.province
     ? getCitiesByProvince(formData.province)
     : [];
+
+  const calculateAge = (birthday: Date): number => {
+    const today = new Date();
+    const age = today.getFullYear() - birthday.getFullYear();
+    const monthDiff = today.getMonth() - birthday.getMonth();
+    const dayDiff = today.getDate() - birthday.getDate();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+      return age - 1;
+    }
+    return age;
+  };
+
+  const handleBirthdaySelect = (date: Date | undefined) => {
+    if (updateBirthday) {
+      updateBirthday(date);
+    }
+    if (date) {
+      const age = calculateAge(date);
+      updateFormData('age', age.toString());
+    }
+    setIsCalendarOpen(false);
+  };
 
   return (
     <div className="space-y-4">
@@ -379,17 +417,49 @@ function StepOne({ formData, updateFormData }: StepProps) {
           placeholder="Your name"
         />
 
-        <FormInput
-          id="age"
-          label="Age"
-          type="number"
-          required
-          min="18"
-          max="100"
-          value={formData.age}
-          onChange={(e) => updateFormData('age', e.target.value)}
-          placeholder="18"
-        />
+        <div>
+          <label htmlFor="birthday" className="mb-2 block text-sm font-medium text-gray-700">
+            Birthday <span className="text-red-500">*</span>
+          </label>
+          <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                id="birthday"
+                variant="outline"
+                className={cn(
+                  'w-full justify-start text-left font-normal h-11 px-3 rounded-lg',
+                  !formData.birthday && 'text-muted-foreground'
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {formData.birthday ? (
+                  format(formData.birthday, 'PPP')
+                ) : (
+                  <span>Pick your birthday</span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={formData.birthday}
+                onSelect={handleBirthdaySelect}
+                disabled={(date) =>
+                  date > new Date() || date < new Date('1900-01-01')
+                }
+                initialFocus
+                captionLayout="dropdown"
+                fromYear={1924}
+                toYear={new Date().getFullYear()}
+              />
+            </PopoverContent>
+          </Popover>
+          {formData.birthday && (
+            <p className="mt-1 text-sm text-gray-600">
+              Age: {calculateAge(formData.birthday)} years old
+            </p>
+          )}
+        </div>
 
         <FormSelect
           id="province"
@@ -807,7 +877,7 @@ function StepFive({ formData, setFormData, setError }: PhotoStepProps) {
     setUploading(true);
     setError('');
 
-    for (let i = 0; i < Math.min(files.length, 4); i++) {
+    for (let i = 0; i < Math.min(files.length, 3); i++) {
       const file = files[i];
 
       if (!ALLOWED_TYPES.includes(file.type)) {
@@ -840,7 +910,7 @@ function StepFive({ formData, setFormData, setError }: PhotoStepProps) {
     if (!hasError) {
       setFormData((prev) => ({
         ...prev,
-        photos: [...prev.photos, ...validFiles].slice(0, 4),
+        photos: [...prev.photos, ...validFiles].slice(0, 3),
       }));
     }
 
@@ -861,7 +931,7 @@ function StepFive({ formData, setFormData, setError }: PhotoStepProps) {
           Add more photos
         </h2>
         <p className="text-center text-sm text-gray-600">
-          Upload 2-4 additional photos (optional)
+          Upload 2-3 additional photos (optional)
         </p>
       </div>
 
@@ -900,7 +970,7 @@ function StepFive({ formData, setFormData, setError }: PhotoStepProps) {
         </div>
       )}
 
-      {formData.photos.length < 4 && (
+      {formData.photos.length < 3 && (
         <label
           htmlFor="gallery-upload"
           className="block w-full cursor-pointer rounded-lg border-2 border-dashed border-gray-300 bg-white/60 p-6 text-center transition-all duration-200 hover:border-pink-400 hover:bg-pink-50/50"
@@ -926,11 +996,11 @@ function StepFive({ formData, setFormData, setError }: PhotoStepProps) {
                 <>
                   <span className="font-medium text-pink-600">Add photos</span>
                   {' ('}
-                  {formData.photos.length}/4)
+                  {formData.photos.length}/3)
                 </>
               )}
             </div>
-            <p className="text-xs text-gray-500">Select up to 4 images</p>
+            <p className="text-xs text-gray-500">Select up to 3 images</p>
           </div>
           <input
             id="gallery-upload"

@@ -28,15 +28,25 @@ export default function SwipeCard({
   const [isFlipped, setIsFlipped] = useState(false);
   const [isFlipping, setIsFlipping] = useState(false);
   const isDraggingRef = useRef(false);
+  const dragStartY = useRef(0);
 
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const rotate = useTransform(x, [-200, 200], [-20, 20]);
+  const rotateX = useTransform(y, [-150, 150], [15, -15]);
   const likeOpacity = useTransform(x, [0, 300], [0, 1]);
-  const nopeOpacity = useTransform(x, [0, -300], [0, 1]);
+  const grayscaleAmount = useTransform(x, [0, -200], [0, 100]);
+  const cardFilter = useTransform(
+    grayscaleAmount,
+    (value) => `grayscale(${value}%) brightness(${100 - value * 0.1}%)`
+  );
 
-  const handleDragStart = () => {
+  const handleDragStart = (
+    _event: MouseEvent | TouchEvent | PointerEvent,
+    info: PanInfo
+  ) => {
     isDraggingRef.current = true;
+    dragStartY.current = info.point.y;
     onDragStateChange?.(true);
   };
 
@@ -62,6 +72,10 @@ export default function SwipeCard({
     if (!isDraggingRef.current && !isFlipping) {
       setIsFlipping(true);
       setIsFlipped(!isFlipped);
+
+      // Reset drag position when flipping
+      x.set(0);
+      y.set(0);
 
       setTimeout(() => {
         setIsFlipping(false);
@@ -147,49 +161,45 @@ export default function SwipeCard({
           className="relative h-full w-full"
           style={{
             rotate,
+            rotateX,
             transformStyle: 'preserve-3d',
+            filter: cardFilter,
           }}
         >
           {!isFlipping && (
             <>
               <motion.div
                 style={{ opacity: likeOpacity }}
-                className="pointer-events-none absolute -inset-1 z-10 rounded-[28px] bg-green-500/40 blur-xl"
+                className="pointer-events-none absolute -inset-1 z-10 rounded-[28px] bg-red-500/5 blur-xl"
               />
 
               <motion.div
-                style={{ opacity: nopeOpacity }}
-                className="pointer-events-none absolute -inset-1 z-10 rounded-[28px] bg-red-500/40 blur-xl"
-              />
-
-              <motion.div
-                style={{ opacity: nopeOpacity }}
-                className="pointer-events-none absolute inset-0 z-20 overflow-hidden rounded-3xl"
+                style={{ opacity: likeOpacity }}
+                className="pointer-events-none absolute inset-0 z-5 overflow-hidden rounded-3xl"
               >
-                <div className="absolute inset-y-0 left-0 w-32 bg-linear-to-r from-red-600/30 to-transparent" />
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background:
+                      'radial-gradient(circle at center, transparent 0%, transparent 50%, rgba(239, 68, 68, 0.25) 75%, rgba(239, 68, 68, 0.4) 70%)',
+                  }}
+                />
               </motion.div>
 
               <motion.div
                 style={{ opacity: likeOpacity }}
                 className="pointer-events-none absolute inset-0 z-20 overflow-hidden rounded-3xl"
               >
-                <div className="absolute inset-y-0 right-0 w-32 bg-linear-to-l from-green-700/30 to-transparent" />
-              </motion.div>
-
-              <motion.div
-                style={{ opacity: nopeOpacity }}
-                className="pointer-events-none absolute top-10 left-10 z-30 -rotate-12 rounded-xl border-4 border-red-500 px-6 py-3"
-              >
-                <span className="text-5xl font-bold text-red-500">NOPE</span>
+                <div className="absolute inset-y-0 right-0 w-32 bg-linear-to-l from-red-700/30 to-transparent" />
               </motion.div>
 
               <motion.div
                 style={{ opacity: likeOpacity }}
-                className="pointer-events-none absolute top-1/2 left-1/2 z-30 -translate-x-1/2 -translate-y-1/2"
+                className="pointer-events-none absolute right-12 bottom-16 z-30"
               >
                 <motion.svg
-                  width="180"
-                  height="180"
+                  width="120"
+                  height="120"
                   viewBox="0 0 180 180"
                   className="drop-shadow-[0_0_20px_rgba(220,38,38,0.6)]"
                   style={{ rotate: -15 }}
@@ -209,16 +219,6 @@ export default function SwipeCard({
                     strokeWidth="8"
                     opacity="0.7"
                   />
-                  <text
-                    x="90"
-                    y="160"
-                    textAnchor="middle"
-                    className="font-serif text-2xl font-bold"
-                    fill="#dc2626"
-                    opacity="0.8"
-                  >
-                    LIKED
-                  </text>
                 </motion.svg>
               </motion.div>
             </>

@@ -72,7 +72,7 @@ export default function Signup() {
     <div className="flex min-h-screen items-center justify-center py-12">
       <Card className="w-full max-w-md rounded-3xl border-0 bg-white/80 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] ring-zinc-950/20 backdrop-blur-xl">
         <CardHeader className="space-y-3 text-center">
-          <h1 className="bg-linear-to-r from-pink-600 to-purple-600 bg-clip-text pb-1 font-serif text-5xl leading-tight font-bold text-transparent">
+          <h1 className="rounded-md bg-linear-to-r from-pink-600 to-purple-600 bg-clip-text pb-1 font-serif text-5xl leading-tight font-bold text-transparent">
             Forkeep
           </h1>
           <p className="font-serif text-sm text-gray-600">
@@ -147,7 +147,8 @@ export default function Signup() {
             <MotionButton
               type="submit"
               disabled={loading}
-              className="w-full bg-linear-to-r from-pink-500 to-purple-500 shadow-[0_10px_30px_-5px_rgba(236,72,153,0.4)] hover:shadow-[0_15px_40px_-5px_rgba(236,72,153,0.5)]"
+              gradientStyle="brand"
+              className="w-full"
               size="lg"
             >
               {loading ? 'Creating account...' : 'Sign Up'}

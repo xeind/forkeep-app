@@ -29,6 +29,7 @@ export default function Matches() {
     id: string;
     name: string;
   } | null>(null);
+  const [hasAnimated, setHasAnimated] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -48,6 +49,7 @@ export default function Matches() {
       console.error('Failed to fetch matches:', error);
     } finally {
       setLoading(false);
+      setHasAnimated(true);
     }
   };
 
@@ -143,12 +145,16 @@ export default function Matches() {
         </div>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {matches.map((match) => (
+          {matches.map((match, index) => (
             <MotionCard
               key={match.id}
-              initial={{ opacity: 0, y: 20 }}
+              initial={hasAnimated ? false : { opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, ease: [0.215, 0.61, 0.355, 1] }}
+              transition={{ 
+                duration: 0.3, 
+                ease: [0.215, 0.61, 0.355, 1],
+                delay: hasAnimated ? 0 : index * 0.05
+              }}
               className="group overflow-hidden rounded-3xl border-zinc-950/10 p-0 shadow-[0_10px_30px_-5px_rgba(0,0,0,0.1)] ring-1 ring-zinc-950/10 transition-all duration-300 ease-out hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)]"
             >
               <div
