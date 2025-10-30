@@ -13,7 +13,10 @@ export default function Discover() {
   const [matchedUser, setMatchedUser] = useState<User | null>(null);
   const [matchId, setMatchId] = useState<string | null>(null);
   const [imagesLoaded, setImagesLoaded] = useState(false);
-  const [exitingCard, setExitingCard] = useState<{ id: string; direction: 'left' | 'right' } | null>(null);
+  const [exitingCard, setExitingCard] = useState<{
+    id: string;
+    direction: 'left' | 'right';
+  } | null>(null);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
   const [fetchingMore, setFetchingMore] = useState(false);
@@ -39,7 +42,12 @@ export default function Discover() {
 
   useEffect(() => {
     const remainingUsers = users.length - currentIndex;
-    if (remainingUsers <= FETCH_THRESHOLD && hasMore && !fetchingMore && !loading) {
+    if (
+      remainingUsers <= FETCH_THRESHOLD &&
+      hasMore &&
+      !fetchingMore &&
+      !loading
+    ) {
       fetchMoreUsers();
     }
   }, [currentIndex, users.length, hasMore, fetchingMore, loading]);
@@ -50,7 +58,8 @@ export default function Discover() {
 
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
-      if (currentIndex >= users.length || loading || !imagesLoaded || swiping) return;
+      if (currentIndex >= users.length || loading || !imagesLoaded || swiping)
+        return;
 
       if (e.key === 'ArrowLeft') {
         handleSwipe('left');
@@ -66,7 +75,7 @@ export default function Discover() {
   const preloadImages = async () => {
     const endIndex = Math.min(currentIndex + 5, users.length);
     const usersToPreload = users.slice(currentIndex, endIndex);
-    
+
     const imagePromises = usersToPreload.map((user) => {
       return new Promise((resolve, reject) => {
         const img = new Image();
@@ -179,10 +188,13 @@ export default function Discover() {
   };
 
   if (loading || !imagesLoaded) {
-    return <LoadingState message="Loading profiles..." />;
+    return (
+      <LoadingState message="Loading profiles..." variant="profile-card" />
+    );
   }
 
-  const showEmptyState = (users.length === 0 || currentIndex >= users.length) && !matchedUser;
+  const showEmptyState =
+    (users.length === 0 || currentIndex >= users.length) && !matchedUser;
   const currentUser = users[currentIndex];
   const nextUser =
     currentIndex + 1 < users.length ? users[currentIndex + 1] : null;
@@ -208,7 +220,12 @@ export default function Discover() {
             <div className="relative h-[600px] w-96">
               <AnimatePresence mode="popLayout">
                 {nextUser && (
-                  <SwipeCard key={nextUser.id} user={nextUser} onSwipe={() => {}} isBackground />
+                  <SwipeCard
+                    key={nextUser.id}
+                    user={nextUser}
+                    onSwipe={() => {}}
+                    isBackground
+                  />
                 )}
 
                 <SwipeCard
@@ -216,7 +233,11 @@ export default function Discover() {
                   user={currentUser}
                   onSwipe={handleSwipe}
                   onExitComplete={handleExitComplete}
-                  exitDirection={exitingCard?.id === currentUser.id ? exitingCard.direction : null}
+                  exitDirection={
+                    exitingCard?.id === currentUser.id
+                      ? exitingCard.direction
+                      : null
+                  }
                 />
               </AnimatePresence>
             </div>
@@ -234,7 +255,7 @@ export default function Discover() {
           currentIndex={currentMatchIndex}
           totalMatches={unviewedMatches.length}
           isUnviewedCarousel={true}
-          allMatchIds={unviewedMatches.map(m => m.id)}
+          allMatchIds={unviewedMatches.map((m) => m.id)}
         />
       )}
 

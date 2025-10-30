@@ -20,12 +20,15 @@ export default function Button({
   type = 'button',
   onClick,
 }: ButtonProps) {
-  const baseStyles = 'rounded-full font-medium shadow-md transition-all duration-200 ease-out';
-  
+  const baseStyles =
+    'rounded-full font-medium shadow-md transition-all duration-200 ease-out';
+
   const variantStyles = {
-    primary: 'bg-pink-500 text-white ring-1 ring-pink-600/20 hover:bg-pink-600 hover:shadow-lg',
+    primary:
+      'bg-pink-500 text-white ring-1 ring-pink-600/20 hover:bg-pink-600 hover:shadow-lg',
     secondary: 'bg-gray-100 text-gray-600 hover:bg-gray-200',
-    danger: 'bg-red-500 text-white ring-1 ring-red-600/20 hover:bg-red-600 hover:shadow-lg',
+    danger:
+      'bg-red-500 text-white ring-1 ring-red-600/20 hover:bg-red-600 hover:shadow-lg',
   };
 
   const sizeStyles = {

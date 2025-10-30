@@ -103,7 +103,9 @@ export default function UserProfile() {
       <div className="flex h-screen items-center justify-center">
         <div className="text-center">
           <div className="mb-4 text-6xl">😕</div>
-          <h2 className="text-2xl font-bold text-gray-800">Profile not found</h2>
+          <h2 className="text-2xl font-bold text-gray-800">
+            Profile not found
+          </h2>
           <p className="mt-2 text-gray-600">
             This user profile could not be loaded.
           </p>
@@ -131,7 +133,7 @@ export default function UserProfile() {
         <div className="relative h-[600px] w-96">
           <motion.div
             layout
-            className="absolute h-[600px] w-96 overflow-hidden rounded-3xl bg-white shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] ring-1 ring-zinc-950/5"
+            className="absolute h-[600px] w-96 overflow-hidden rounded-3xl bg-white shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] ring-1 ring-zinc-950/10"
           >
             <div className="relative h-64 w-full overflow-hidden">
               <img
@@ -168,7 +170,9 @@ export default function UserProfile() {
                     />
                   </svg>
                   <span className="text-xs font-medium text-gray-600">
-                    {profile.city && profile.province ? `${profile.city}, ${profile.province}` : profile.city || profile.province}
+                    {profile.city && profile.province
+                      ? `${profile.city}, ${profile.province}`
+                      : profile.city || profile.province}
                   </span>
                 </div>
               )}
@@ -202,7 +206,7 @@ export default function UserProfile() {
               whileTap={{ scale: 0.95 }}
               transition={{ duration: 0.2, ease: 'easeOut' }}
               onClick={() => navigate(`/chat/${matchId}`)}
-              className="absolute bottom-6 right-6 flex h-14 w-14 items-center justify-center rounded-full bg-pink-500 shadow-lg ring-1 ring-pink-600/20 transition-all duration-200 ease-out hover:bg-pink-600 hover:shadow-xl"
+              className="absolute right-6 bottom-6 flex h-14 w-14 items-center justify-center rounded-full bg-pink-500 shadow-lg ring-1 ring-pink-600/20 transition-all duration-200 ease-out hover:bg-pink-600 hover:shadow-xl"
             >
               <svg
                 className="h-6 w-6 text-white"
@@ -218,7 +222,7 @@ export default function UserProfile() {
                 />
               </svg>
               {unreadCount > 0 && (
-                <div className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white shadow-md ring-2 ring-white">
+                <div className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white shadow-md ring-2 ring-white">
                   {unreadCount}
                 </div>
               )}

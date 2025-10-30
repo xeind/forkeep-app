@@ -115,8 +115,17 @@ export default function Chat() {
                 </h2>
                 <p className="text-xs text-gray-500">
                   {matchInfo.matchedUser.age}
-                  {(matchInfo.matchedUser.city || matchInfo.matchedUser.province) && (
-                    <> • {matchInfo.matchedUser.city && matchInfo.matchedUser.province ? `${matchInfo.matchedUser.city}, ${matchInfo.matchedUser.province}` : matchInfo.matchedUser.city || matchInfo.matchedUser.province}</>
+                  {(matchInfo.matchedUser.city ||
+                    matchInfo.matchedUser.province) && (
+                    <>
+                      {' '}
+                      •{' '}
+                      {matchInfo.matchedUser.city &&
+                      matchInfo.matchedUser.province
+                        ? `${matchInfo.matchedUser.city}, ${matchInfo.matchedUser.province}`
+                        : matchInfo.matchedUser.city ||
+                          matchInfo.matchedUser.province}
+                    </>
                   )}
                 </p>
               </div>

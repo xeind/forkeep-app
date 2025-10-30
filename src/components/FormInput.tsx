@@ -13,7 +13,10 @@ const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
     return (
       <div className="w-full">
         {label && (
-          <Label htmlFor={id} className="mb-1 block text-sm font-medium text-gray-700">
+          <Label
+            htmlFor={id}
+            className="mb-1 block text-sm font-medium text-gray-700"
+          >
             {label}
           </Label>
         )}
@@ -28,9 +31,7 @@ const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
           )}
           {...props}
         />
-        {error && (
-          <p className="mt-2 px-1 text-sm text-red-600">{error}</p>
-        )}
+        {error && <p className="mt-2 px-1 text-sm text-red-600">{error}</p>}
       </div>
     );
   }

@@ -3,7 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { api } from '../lib/api';
 import Spinner from '../components/Spinner';
-import { getAllProvinces, getCitiesByProvince } from '../data/philippinesLocations';
+import {
+  getAllProvinces,
+  getCitiesByProvince,
+} from '../data/philippinesLocations';
 import { MotionButton } from '@/components/MotionButton';
 import FormInput from '@/components/FormInput';
 import FormTextarea from '@/components/FormTextarea';
@@ -139,7 +142,7 @@ export default function Profile() {
             <div className="relative h-[600px] w-96">
               <motion.div
                 layout
-                className="absolute h-[600px] w-96 overflow-hidden rounded-3xl bg-white shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] ring-1 ring-zinc-950/5"
+                className="absolute h-[600px] w-96 overflow-hidden rounded-3xl bg-white shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] ring-1 ring-zinc-950/10"
               >
                 <div className="relative h-64 w-full overflow-hidden">
                   <img
@@ -176,7 +179,9 @@ export default function Profile() {
                         />
                       </svg>
                       <span className="text-xs font-medium text-gray-600">
-                        {profile.city && profile.province ? `${profile.city}, ${profile.province}` : profile.city || profile.province}
+                        {profile.city && profile.province
+                          ? `${profile.city}, ${profile.province}`
+                          : profile.city || profile.province}
                       </span>
                     </div>
                   )}
@@ -206,7 +211,8 @@ export default function Profile() {
             <div className="flex w-96 gap-3">
               <MotionButton
                 onClick={() => setEditing(true)}
-                className="flex-1 bg-linear-to-r from-pink-500 to-pink-600 shadow-[0_10px_30px_-5px_rgba(236,72,153,0.4)] hover:shadow-[0_15px_40px_-5px_rgba(236,72,153,0.5)]"
+                gradientStyle="brand"
+                className="flex-1"
               >
                 Edit Profile
               </MotionButton>
@@ -230,7 +236,7 @@ export default function Profile() {
           >
             <motion.div
               layout
-              className="overflow-hidden rounded-3xl bg-white/80 p-8 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] ring-1 ring-white/20 backdrop-blur-xl"
+              className="overflow-hidden rounded-3xl bg-white/80 p-8 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] ring-1 ring-zinc-950/10 backdrop-blur-xl"
             >
               <h2 className="mb-6 bg-linear-to-r from-gray-900 to-gray-700 bg-clip-text text-center text-2xl font-bold text-transparent">
                 Edit Profile
@@ -282,9 +288,9 @@ export default function Profile() {
                   onValueChange={(value) => {
                     setFormData({ ...formData, province: value, city: '' });
                   }}
-                  options={getAllProvinces().map((province) => ({ 
-                    value: province, 
-                    label: province 
+                  options={getAllProvinces().map((province) => ({
+                    value: province,
+                    label: province,
                   }))}
                   placeholder="Select province..."
                 />
@@ -301,10 +307,12 @@ export default function Profile() {
                     onValueChange={(value) =>
                       setFormData({ ...formData, city: value })
                     }
-                    options={getCitiesByProvince(formData.province).map((city) => ({ 
-                      value: city, 
-                      label: city 
-                    }))}
+                    options={getCitiesByProvince(formData.province).map(
+                      (city) => ({
+                        value: city,
+                        label: city,
+                      })
+                    )}
                     placeholder="Select city..."
                   />
                 )}
@@ -324,7 +332,8 @@ export default function Profile() {
                   <MotionButton
                     type="submit"
                     disabled={saving}
-                    className="flex-1 bg-linear-to-r from-pink-500 to-pink-600 shadow-[0_10px_30px_-5px_rgba(236,72,153,0.4)] hover:shadow-[0_15px_40px_-5px_rgba(236,72,153,0.5)]"
+                    gradientStyle="brand"
+                    className="flex-1"
                   >
                     {saving ? 'Saving...' : 'Save Changes'}
                   </MotionButton>

@@ -48,7 +48,8 @@ export default function EmptyState({
         {action && (
           <MotionButton
             onClick={action.onClick}
-            className="mt-6 bg-pink-500 hover:bg-pink-600"
+            gradientStyle="brand"
+            className="mt-6"
           >
             {action.label}
           </MotionButton>

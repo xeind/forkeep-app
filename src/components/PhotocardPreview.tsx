@@ -26,7 +26,7 @@ export default function PhotocardPreview({
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.3, ease: 'easeOut' }}
-      className="relative mx-auto w-full max-w-sm overflow-hidden rounded-2xl bg-white shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] ring-1 ring-black/5"
+      className="relative mx-auto w-full max-w-sm overflow-hidden rounded-2xl bg-white shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] ring-1 ring-zinc-950/10"
     >
       <div className="relative aspect-[3/4] overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
         {photoUrl ? (
@@ -56,20 +56,20 @@ export default function PhotocardPreview({
           </div>
         )}
 
-        <div className="absolute right-3 top-3 rounded-md bg-black/40 px-2 py-1 font-mono text-xs text-white/90 backdrop-blur-sm">
+        <div className="absolute top-2.5 right-2.5 rounded-md bg-black/40 px-1.5 py-0.5 font-mono text-[10px] text-white/90 backdrop-blur-sm">
           {today}
         </div>
       </div>
 
-      <div className="bg-white p-6">
-        <h2 className="font-serif text-3xl font-bold text-gray-900">
+      <div className="bg-white p-4">
+        <h2 className="font-serif text-2xl font-bold text-gray-900">
           {name || 'Your Name'}
           {age && `, ${age}`}
         </h2>
         {(city || province) && (
-          <p className="mt-1 flex items-center text-sm text-gray-600">
+          <p className="mt-0.5 flex items-center text-xs text-gray-600">
             <svg
-              className="mr-1 h-4 w-4"
+              className="mr-1 h-3 w-3"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"

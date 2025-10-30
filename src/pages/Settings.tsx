@@ -24,7 +24,7 @@ export default function Settings() {
         </div>
 
         <div className="space-y-6">
-          <div className="overflow-hidden rounded-3xl bg-white/80 shadow-[0_10px_30px_-5px_rgba(0,0,0,0.1)] ring-1 ring-white/20 backdrop-blur-xl">
+          <div className="overflow-hidden rounded-3xl bg-white/80 shadow-[0_10px_30px_-5px_rgba(0,0,0,0.1)] ring-1 ring-zinc-950/10 backdrop-blur-xl">
             <div className="border-b border-zinc-950/5 px-6 py-4">
               <h2 className="text-lg font-semibold text-gray-900">
                 Notifications
@@ -52,7 +52,7 @@ export default function Settings() {
             </div>
           </div>
 
-          <div className="overflow-hidden rounded-3xl bg-white/80 shadow-[0_10px_30px_-5px_rgba(0,0,0,0.1)] ring-1 ring-white/20 backdrop-blur-xl">
+          <div className="overflow-hidden rounded-3xl bg-white/80 shadow-[0_10px_30px_-5px_rgba(0,0,0,0.1)] ring-1 ring-zinc-950/10 backdrop-blur-xl">
             <div className="border-b border-zinc-950/5 px-6 py-4">
               <h2 className="text-lg font-semibold text-gray-900">Privacy</h2>
             </div>
@@ -77,7 +77,7 @@ export default function Settings() {
               </div>
             </div>
           </div>
-          <div className="overflow-hidden rounded-3xl bg-white/80 shadow-[0_10px_30px_-5px_rgba(0,0,0,0.1)] ring-1 ring-white/20 backdrop-blur-xl">
+          <div className="overflow-hidden rounded-3xl bg-white/80 shadow-[0_10px_30px_-5px_rgba(0,0,0,0.1)] ring-1 ring-zinc-950/10 backdrop-blur-xl">
             <div className="border-b border-zinc-950/5 px-6 py-4">
               <h2 className="text-lg font-semibold text-gray-900">Account</h2>
             </div>
@@ -93,13 +93,15 @@ export default function Settings() {
             </div>
           </div>
 
-          <div className="overflow-hidden rounded-3xl bg-white/80 shadow-[0_10px_30px_-5px_rgba(0,0,0,0.1)] ring-1 ring-white/20 backdrop-blur-xl">
+          <div className="overflow-hidden rounded-3xl bg-white/80 shadow-[0_10px_30px_-5px_rgba(0,0,0,0.1)] ring-1 ring-zinc-950/10 backdrop-blur-xl">
             <div className="border-b border-zinc-950/5 px-6 py-4">
               <h2 className="text-lg font-semibold text-gray-900">About</h2>
             </div>
             <div className="space-y-2 px-6 py-4 text-sm text-gray-600">
               <p>Version 1.0.0</p>
-              <p>Made with ❤️ by Forkeep Team</p>
+              <p>
+                Made with ❤️ by <span className="font-serif">Forkeep</span> Team
+              </p>
             </div>
           </div>
         </div>

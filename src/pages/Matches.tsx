@@ -5,11 +5,30 @@ import { api, type Match } from '../lib/api';
 import { getCurrentUserId } from '../utils/auth';
 import LoadingState from '../components/common/LoadingState';
 import EmptyState from '../components/common/EmptyState';
+import { Card } from '../components/ui/card';
+import { Badge } from '../components/ui/badge';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '../components/ui/alert-dialog';
+
+const MotionCard = motion.create(Card);
 
 export default function Matches() {
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
   const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
+  const [unmatchDialogOpen, setUnmatchDialogOpen] = useState(false);
+  const [selectedMatch, setSelectedMatch] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -22,7 +41,6 @@ export default function Matches() {
 
   const fetchMatches = async () => {
     try {
-      setLoading(true);
       const data = await api.matches.list();
       setMatches(data.matches);
       await fetchUnreadCounts();
@@ -61,24 +79,24 @@ export default function Matches() {
     navigate(`/chat/${matchId}`);
   };
 
-  const handleUnmatch = async (
+  const handleUnmatchClick = (
     e: React.MouseEvent,
     matchId: string,
     userName: string
   ) => {
     e.stopPropagation();
+    setSelectedMatch({ id: matchId, name: userName });
+    setUnmatchDialogOpen(true);
+  };
 
-    if (
-      !confirm(
-        `Are you sure you want to unmatch with ${userName}? This action cannot be undone.`
-      )
-    ) {
-      return;
-    }
+  const handleUnmatchConfirm = async () => {
+    if (!selectedMatch) return;
 
     try {
-      await api.matches.delete(matchId);
-      setMatches((prev) => prev.filter((m) => m.id !== matchId));
+      await api.matches.delete(selectedMatch.id);
+      setMatches((prev) => prev.filter((m) => m.id !== selectedMatch.id));
+      setUnmatchDialogOpen(false);
+      setSelectedMatch(null);
     } catch (error) {
       console.error('Failed to unmatch:', error);
       alert('Failed to unmatch. Please try again.');
@@ -126,9 +144,12 @@ export default function Matches() {
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {matches.map((match) => (
-            <div
+            <MotionCard
               key={match.id}
-              className="group overflow-hidden rounded-3xl bg-white shadow-[0_10px_30px_-5px_rgba(0,0,0,0.1)] ring-1 ring-zinc-950/5 transition-all duration-300 ease-out hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)]"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, ease: [0.215, 0.61, 0.355, 1] }}
+              className="group overflow-hidden rounded-3xl border-zinc-950/10 p-0 shadow-[0_10px_30px_-5px_rgba(0,0,0,0.1)] ring-1 ring-zinc-950/10 transition-all duration-300 ease-out hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)]"
             >
               <div
                 onClick={() => handleCardClick(match.matchedUser.id)}
@@ -175,7 +196,7 @@ export default function Matches() {
                   whileTap={{ scale: 0.98 }}
                   transition={{ duration: 0.2, ease: [0.215, 0.61, 0.355, 1] }}
                   onClick={(e) =>
-                    handleUnmatch(e, match.id, match.matchedUser.name)
+                    handleUnmatchClick(e, match.id, match.matchedUser.name)
                   }
                   className="flex items-center justify-center rounded-xl bg-gray-100 px-4 py-2.5 transition-all duration-200 ease-out hover:bg-gray-200"
                 >
@@ -215,16 +236,42 @@ export default function Matches() {
                   </svg>
                   <span className="text-sm">Message</span>
                   {unreadCounts[match.id] > 0 && (
-                    <div className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white shadow-md ring-2 ring-white">
+                    <Badge
+                      variant="destructive"
+                      className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 text-xs shadow-md ring-2 ring-white"
+                    >
                       {unreadCounts[match.id]}
-                    </div>
+                    </Badge>
                   )}
                 </motion.button>
               </div>
-            </div>
+            </MotionCard>
           ))}
         </div>
       </motion.div>
+
+      <AlertDialog open={unmatchDialogOpen} onOpenChange={setUnmatchDialogOpen}>
+        <AlertDialogContent className="rounded-3xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Unmatch with {selectedMatch?.name}?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. You will no longer be able to
+              message each other and this match will be removed from your list.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleUnmatchConfirm}
+              className="rounded-xl bg-red-500 hover:bg-red-600"
+            >
+              Unmatch
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

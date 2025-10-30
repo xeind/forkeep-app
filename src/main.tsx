@@ -1,6 +1,12 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+} from 'react-router-dom';
 import './index.css';
 import Login from './pages/Login.tsx';
 import SignupWizard from './pages/SignupWizard.tsx';
@@ -20,7 +26,11 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 function ProtectedRouteWithLayout({ children }: { children: React.ReactNode }) {
   const token = localStorage.getItem('forkeep_token');
-  return token ? <AppLayout>{children}</AppLayout> : <Navigate to="/" replace />;
+  return token ? (
+    <AppLayout>{children}</AppLayout>
+  ) : (
+    <Navigate to="/" replace />
+  );
 }
 
 function GuestRoute({ children }: { children: React.ReactNode }) {
@@ -31,15 +41,31 @@ function GuestRoute({ children }: { children: React.ReactNode }) {
 function AppRoutes() {
   const location = useLocation();
   const token = localStorage.getItem('forkeep_token');
-  const isAuthPage = location.pathname === '/' || location.pathname === '/signup';
-  const showNavbar = token && !location.pathname.startsWith('/chat') && !isAuthPage;
+  const isAuthPage =
+    location.pathname === '/' || location.pathname === '/signup';
+  const showNavbar =
+    token && !location.pathname.startsWith('/chat') && !isAuthPage;
 
   return (
     <>
       {showNavbar && <Navbar />}
       <Routes>
-        <Route path="/" element={<GuestRoute><Login /></GuestRoute>} />
-        <Route path="/signup" element={<GuestRoute><SignupWizard /></GuestRoute>} />
+        <Route
+          path="/"
+          element={
+            <GuestRoute>
+              <Login />
+            </GuestRoute>
+          }
+        />
+        <Route
+          path="/signup"
+          element={
+            <GuestRoute>
+              <SignupWizard />
+            </GuestRoute>
+          }
+        />
         <Route
           path="/discover"
           element={

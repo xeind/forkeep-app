@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { api } from '../lib/api';
-import PhotocardPreview from '../components/PhotocardPreview';
 import {
   getAllProvinces,
   getCitiesByProvince,
@@ -11,6 +10,10 @@ import { MotionButton } from '@/components/MotionButton';
 import FormInput from '@/components/FormInput';
 import FormTextarea from '@/components/FormTextarea';
 import FormSelect from '@/components/FormSelect';
+import { Card, CardHeader, CardContent } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertCircle } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
 
 interface SignupFormData {
   name: string;
@@ -32,6 +35,7 @@ const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
 
 export default function SignupWizard() {
   const [currentStep, setCurrentStep] = useState(1);
+  const [direction, setDirection] = useState<'forward' | 'backward'>('forward');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -55,8 +59,81 @@ export default function SignupWizard() {
     setError('');
   };
 
+  const validateCurrentStep = (): boolean => {
+    setError('');
+
+    switch (currentStep) {
+      case 1:
+        if (!formData.name.trim()) {
+          setError('Name is required');
+          return false;
+        }
+        if (!formData.age) {
+          setError('Age is required');
+          return false;
+        }
+        const ageNum = parseInt(formData.age);
+        if (isNaN(ageNum) || ageNum < 18 || ageNum > 100) {
+          setError('Age must be between 18 and 100');
+          return false;
+        }
+        return true;
+
+      case 2:
+        return true;
+
+      case 3:
+        if (!formData.bio.trim()) {
+          setError('Bio is required');
+          return false;
+        }
+        if (formData.bio.trim().length < 10) {
+          setError('Bio must be at least 10 characters');
+          return false;
+        }
+        return true;
+
+      case 4:
+        if (!formData.photoUrl) {
+          setError('Profile photo is required');
+          return false;
+        }
+        return true;
+
+      case 5:
+        return true;
+
+      case 6:
+        if (!formData.email.trim()) {
+          setError('Email is required');
+          return false;
+        }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+          setError('Please enter a valid email address');
+          return false;
+        }
+        if (!formData.password) {
+          setError('Password is required');
+          return false;
+        }
+        if (formData.password.length < 8) {
+          setError('Password must be at least 8 characters');
+          return false;
+        }
+        return true;
+
+      default:
+        return true;
+    }
+  };
+
   const nextStep = () => {
+    if (!validateCurrentStep()) {
+      return;
+    }
+
     if (currentStep < TOTAL_STEPS) {
+      setDirection('forward');
       setCurrentStep(currentStep + 1);
       setError('');
     }
@@ -64,6 +141,7 @@ export default function SignupWizard() {
 
   const prevStep = () => {
     if (currentStep > 1) {
+      setDirection('backward');
       setCurrentStep(currentStep - 1);
       setError('');
     }
@@ -123,104 +201,144 @@ export default function SignupWizard() {
 
   return (
     <div className="flex min-h-screen items-center justify-center py-12">
-      <motion.div
-        layout
-        transition={{ duration: 0.3, ease: 'easeOut' }}
-        className="w-full max-w-md space-y-8 rounded-3xl bg-white/80 p-10 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] ring-1 ring-zinc-950/20 backdrop-blur-xl"
-      >
-        <div className="text-center">
-          <h1 className="bg-linear-to-r from-pink-600 to-purple-600 bg-clip-text pb-1 text-5xl leading-tight font-bold text-transparent">
-            Join Forkeep
-          </h1>
-          <p className="mt-3 text-sm text-gray-600">
-            Step {currentStep} of {TOTAL_STEPS}
-          </p>
-        </div>
-
-        {error && (
-          <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600 ring-1 ring-red-200">
-            {error}
-          </div>
-        )}
-
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentStep}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.2, ease: 'easeOut' }}
-          >
-            {currentStep === 1 && (
-              <StepOne formData={formData} updateFormData={updateFormData} />
-            )}
-            {currentStep === 2 && (
-              <StepTwo formData={formData} updateFormData={updateFormData} />
-            )}
-            {currentStep === 3 && (
-              <StepThree formData={formData} updateFormData={updateFormData} />
-            )}
-            {currentStep === 4 && (
-              <StepFour
-                formData={formData}
-                setFormData={setFormData}
-                setError={setError}
+      <div className="w-full max-w-md backdrop-blur-xl">
+        <Card className="space-y-8 rounded-3xl bg-white/80 p-10 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] ring-1 ring-zinc-950/10">
+          <CardHeader className="p-0">
+            <div className="text-center">
+              <Link to="/" className="block">
+                <h1
+                  className="cursor-pointer pb-1 text-5xl leading-tight font-bold text-gray-900 transition-colors duration-200 hover:text-pink-600"
+                  style={{
+                    fontFamily:
+                      "'Noto Serif', Georgia, 'Times New Roman', serif",
+                  }}
+                >
+                  Join Forkeep
+                </h1>
+              </Link>
+              <p className="mt-3 text-sm text-gray-600">
+                Step {currentStep} of {TOTAL_STEPS}
+              </p>
+              <Progress
+                value={(currentStep / TOTAL_STEPS) * 100}
+                className="mt-4 h-2"
               />
-            )}
-            {currentStep === 5 && (
-              <StepFive
-                formData={formData}
-                setFormData={setFormData}
-                setError={setError}
-              />
-            )}
-            {currentStep === 6 && (
-              <StepSix formData={formData} updateFormData={updateFormData} />
-            )}
-          </motion.div>
-        </AnimatePresence>
+            </div>
+          </CardHeader>
 
-        <div className="flex items-center justify-between gap-4 pt-4">
-          {currentStep > 1 ? (
-            <MotionButton
-              onClick={prevStep}
-              variant="outline"
-              className="font-semibold"
-            >
-              Back
-            </MotionButton>
-          ) : (
-            <div />
-          )}
+          <CardContent className="space-y-8 p-0">
+            {error && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
 
-          {currentStep < TOTAL_STEPS ? (
-            <MotionButton
-              onClick={nextStep}
-              className="ml-auto bg-linear-to-r from-pink-500 to-purple-500 shadow-[0_10px_30px_-5px_rgba(236,72,153,0.4)] hover:shadow-[0_15px_40px_-5px_rgba(236,72,153,0.5)]"
-            >
-              Next
-            </MotionButton>
-          ) : (
-            <MotionButton
-              onClick={handleSubmit}
-              disabled={loading}
-              className="ml-auto bg-linear-to-r from-pink-500 to-purple-500 shadow-[0_10px_30px_-5px_rgba(236,72,153,0.4)] hover:shadow-[0_15px_40px_-5px_rgba(236,72,153,0.5)]"
-            >
-              {loading ? 'Creating account...' : 'Create Account'}
-            </MotionButton>
-          )}
-        </div>
+            <div className="min-h-[300px]">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentStep}
+                  initial={{
+                    opacity: 0,
+                    x: direction === 'forward' ? 26 : -26,
+                  }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{
+                    opacity: 0,
+                    x: direction === 'forward' ? -26 : 26,
+                  }}
+                  transition={{
+                    duration: 0.3,
+                    ease: [0.645, 0.045, 0.355, 1],
+                  }}
+                >
+                  {currentStep === 1 && (
+                    <StepOne
+                      formData={formData}
+                      updateFormData={updateFormData}
+                    />
+                  )}
+                  {currentStep === 2 && (
+                    <StepTwo
+                      formData={formData}
+                      updateFormData={updateFormData}
+                    />
+                  )}
+                  {currentStep === 3 && (
+                    <StepThree
+                      formData={formData}
+                      updateFormData={updateFormData}
+                    />
+                  )}
+                  {currentStep === 4 && (
+                    <StepFour
+                      formData={formData}
+                      setFormData={setFormData}
+                      setError={setError}
+                    />
+                  )}
+                  {currentStep === 5 && (
+                    <StepFive
+                      formData={formData}
+                      setFormData={setFormData}
+                      setError={setError}
+                    />
+                  )}
+                  {currentStep === 6 && (
+                    <StepSix
+                      formData={formData}
+                      updateFormData={updateFormData}
+                    />
+                  )}
+                </motion.div>
+              </AnimatePresence>
+            </div>
 
-        <p className="text-center text-sm text-gray-600">
-          Already have an account?{' '}
-          <Link
-            to="/"
-            className="font-medium text-pink-600 transition-colors duration-200 hover:text-pink-500"
-          >
-            Sign in
-          </Link>
-        </p>
-      </motion.div>
+            <div className="flex items-center justify-between gap-4 pt-4">
+              {currentStep > 1 ? (
+                <MotionButton
+                  onClick={prevStep}
+                  variant="outline"
+                  className="font-semibold"
+                >
+                  Back
+                </MotionButton>
+              ) : (
+                <div />
+              )}
+
+              {currentStep < TOTAL_STEPS ? (
+                <MotionButton
+                  onClick={nextStep}
+                  gradientStyle="brand"
+                  className="ml-auto"
+                >
+                  Next
+                </MotionButton>
+              ) : (
+                <MotionButton
+                  onClick={handleSubmit}
+                  disabled={loading}
+                  gradientStyle="brand"
+                  className="ml-auto"
+                >
+                  {loading ? 'Creating account...' : 'Create Account'}
+                </MotionButton>
+              )}
+            </div>
+
+            <p className="text-center text-sm text-gray-600">
+              Already have an account?{' '}
+              <Link
+                to="/"
+                className="font-medium text-pink-600 transition-colors duration-200 hover:text-pink-700 hover:underline"
+              >
+                Sign in
+              </Link>
+            </p>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
@@ -250,78 +368,208 @@ function StepOne({ formData, updateFormData }: StepProps) {
         </h2>
       </div>
 
-      <FormInput
-        id="name"
-        label="Name"
-        type="text"
-        required
-        value={formData.name}
-        onChange={(e) => updateFormData('name', e.target.value)}
-        placeholder="Your name"
-      />
+      <div className="space-y-4">
+        <FormInput
+          id="name"
+          label="Name"
+          type="text"
+          required
+          value={formData.name}
+          onChange={(e) => updateFormData('name', e.target.value)}
+          placeholder="Your name"
+        />
 
-      <FormInput
-        id="age"
-        label="Age"
-        type="number"
-        required
-        min="18"
-        max="100"
-        value={formData.age}
-        onChange={(e) => updateFormData('age', e.target.value)}
-        placeholder="18"
-      />
+        <FormInput
+          id="age"
+          label="Age"
+          type="number"
+          required
+          min="18"
+          max="100"
+          value={formData.age}
+          onChange={(e) => updateFormData('age', e.target.value)}
+          placeholder="18"
+        />
 
-      <FormSelect
-        id="province"
-        label={
-          <>
-            Province <span className="text-gray-400">(optional)</span>
-          </>
-        }
-        value={formData.province}
-        onValueChange={(value) => {
-          updateFormData('province', value);
-          updateFormData('city', '');
-        }}
-        options={provinces.map((province) => ({
-          value: province,
-          label: province,
-        }))}
-        placeholder="Select province..."
-      />
-
-      {formData.province && (
         <FormSelect
-          id="city"
+          id="province"
           label={
             <>
-              City <span className="text-gray-400">(optional)</span>
+              Province <span className="text-gray-400">(optional)</span>
             </>
           }
-          value={formData.city}
-          onValueChange={(value) => updateFormData('city', value)}
-          options={cities.map((city) => ({ value: city, label: city }))}
-          placeholder="Select city..."
+          value={formData.province}
+          onValueChange={(value) => {
+            updateFormData('province', value);
+            updateFormData('city', '');
+          }}
+          options={provinces.map((province) => ({
+            value: province,
+            label: province,
+          }))}
+          placeholder="Select province..."
         />
-      )}
+
+        {formData.province && (
+          <FormSelect
+            id="city"
+            label={
+              <>
+                City <span className="text-gray-400">(optional)</span>
+              </>
+            }
+            value={formData.city}
+            onValueChange={(value) => updateFormData('city', value)}
+            options={cities.map((city) => ({ value: city, label: city }))}
+            placeholder="Select city..."
+          />
+        )}
+      </div>
     </div>
   );
 }
 
 function StepTwo({ formData, updateFormData }: StepProps) {
+  const [hoveredButton, setHoveredButton] = useState<string | null>(null);
+
   const genderOptions = [
-    { value: 'Male', icon: '♂️' },
-    { value: 'Female', icon: '♀️' },
-    { value: 'Non-binary', icon: '⚧️' },
-    { value: 'Other', icon: '✨' },
+    { value: 'Male' },
+    { value: 'Female' },
+    { value: 'Non-binary' },
+    { value: 'Other' },
   ];
 
   const preferenceOptions = [
-    { value: 'Men', icon: '♂️' },
-    { value: 'Women', icon: '♀️' },
-    { value: 'Everyone', icon: '🌈' },
+    { value: 'Men' },
+    { value: 'Women' },
+    { value: 'Everyone' },
   ];
+
+  const AnimatedButton = motion.create('button');
+
+  const getColorClasses = (value: string, isSelected: boolean) => {
+    if (!isSelected) {
+      return 'bg-white/60 text-gray-700 ring-1 ring-zinc-950/10 hover:bg-white hover:ring-pink-500/30';
+    }
+
+    const colorMap: Record<string, string> = {
+      Male: 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-[0_0_0_1px_rgba(59,130,246,0.1),0_2px_8px_rgba(59,130,246,0.3),0_0_20px_rgba(59,130,246,0.15)] ring-2 ring-blue-500/50',
+      Men: 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-[0_0_0_1px_rgba(59,130,246,0.1),0_2px_8px_rgba(59,130,246,0.3),0_0_20px_rgba(59,130,246,0.15)] ring-2 ring-blue-500/50',
+      Female:
+        'bg-gradient-to-r from-pink-500 to-pink-600 text-white shadow-[0_0_0_1px_rgba(236,72,153,0.1),0_2px_8px_rgba(236,72,153,0.3),0_0_20px_rgba(236,72,153,0.15)] ring-2 ring-pink-500/50',
+      Women:
+        'bg-gradient-to-r from-pink-500 to-pink-600 text-white shadow-[0_0_0_1px_rgba(236,72,153,0.1),0_2px_8px_rgba(236,72,153,0.3),0_0_20px_rgba(236,72,153,0.15)] ring-2 ring-pink-500/50',
+      'Non-binary':
+        'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-[0_0_0_1px_rgba(168,85,247,0.1),0_2px_8px_rgba(168,85,247,0.3),0_0_20px_rgba(168,85,247,0.15)] ring-2 ring-purple-500/50',
+      Other:
+        'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-[0_0_0_1px_rgba(107,114,128,0.1),0_2px_8px_rgba(107,114,128,0.3),0_0_20px_rgba(107,114,128,0.15)] ring-2 ring-gray-500/50',
+      Everyone:
+        'bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 text-white shadow-[0_0_0_1px_rgba(147,51,234,0.1),0_2px_8px_rgba(147,51,234,0.3),0_0_20px_rgba(147,51,234,0.15)] ring-2 ring-purple-500/50',
+    };
+
+    return (
+      colorMap[value] ||
+      'bg-gradient-to-r from-pink-500 to-pink-600 text-white shadow-[0_0_0_1px_rgba(236,72,153,0.1),0_2px_8px_rgba(236,72,153,0.3),0_0_20px_rgba(236,72,153,0.15)] ring-2 ring-pink-500/50'
+    );
+  };
+
+  const getIcon = (value: string) => {
+    const icons = {
+      Male: (
+        <svg
+          className="h-8 w-8"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
+          <circle cx="10" cy="14" r="6" />
+          <line x1="14.5" y1="9.5" x2="20" y2="4" />
+          <polyline points="16 4 20 4 20 8" />
+        </svg>
+      ),
+      Female: (
+        <svg
+          className="h-8 w-8"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
+          <circle cx="12" cy="8" r="6" />
+          <line x1="12" y1="14" x2="12" y2="22" />
+          <line x1="9" y1="19" x2="15" y2="19" />
+        </svg>
+      ),
+      'Non-binary': (
+        <svg
+          className="h-8 w-8"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+        >
+          <line x1="12" y1="3" x2="12" y2="21" />
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="5.64" y1="5.64" x2="18.36" y2="18.36" />
+          <line x1="18.36" y1="5.64" x2="5.64" y2="18.36" />
+        </svg>
+      ),
+      Other: (
+        <svg
+          className="h-8 w-8"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+        </svg>
+      ),
+      Men: (
+        <svg
+          className="h-8 w-8"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
+          <circle cx="10" cy="14" r="6" />
+          <line x1="14.5" y1="9.5" x2="20" y2="4" />
+          <polyline points="16 4 20 4 20 8" />
+        </svg>
+      ),
+      Women: (
+        <svg
+          className="h-8 w-8"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
+          <circle cx="12" cy="8" r="6" />
+          <line x1="12" y1="14" x2="12" y2="22" />
+          <line x1="9" y1="19" x2="15" y2="19" />
+        </svg>
+      ),
+      Everyone: (
+        <svg
+          className="h-8 w-8"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        </svg>
+      ),
+    };
+    return icons[value as keyof typeof icons];
+  };
 
   return (
     <div className="space-y-6">
@@ -332,51 +580,87 @@ function StepTwo({ formData, updateFormData }: StepProps) {
       </div>
 
       <div>
-        <label className="mb-3 block text-sm font-medium text-gray-700">
+        <div
+          className="mb-3 text-sm font-medium text-gray-700"
+          role="group"
+          aria-label="Gender identity"
+        >
           I identify as...
-        </label>
+        </div>
         <div className="grid grid-cols-4 gap-3">
           {genderOptions.map((option) => (
-            <motion.button
-              key={option.value}
-              type="button"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => updateFormData('gender', option.value)}
-              title={option.value}
-              className={`relative flex aspect-square items-center justify-center rounded-lg transition-all duration-200 ${
-                formData.gender === option.value
-                  ? 'bg-gradient-to-r from-pink-500 to-purple-500 shadow-lg ring-2 ring-pink-500/50'
-                  : 'bg-white/60 ring-1 ring-zinc-950/10 hover:bg-white hover:ring-pink-500/30'
-              }`}
-            >
-              <span className="text-4xl">{option.icon}</span>
-            </motion.button>
+            <div key={option.value} className="relative">
+              <AnimatedButton
+                type="button"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => updateFormData('gender', option.value)}
+                onMouseEnter={() => setHoveredButton(`gender-${option.value}`)}
+                onMouseLeave={() => setHoveredButton(null)}
+                className={`flex aspect-square w-full items-center justify-center rounded-lg transition-all duration-200 ${getColorClasses(
+                  option.value,
+                  formData.gender === option.value
+                )}`}
+              >
+                {getIcon(option.value)}
+              </AnimatedButton>
+              {hoveredButton === `gender-${option.value}` && (
+                <motion.div
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.15 }}
+                  className="pointer-events-none absolute -top-10 left-1/2 z-10 -translate-x-1/2 rounded-md bg-gray-900 px-2 py-1 text-xs whitespace-nowrap text-white shadow-lg"
+                >
+                  {option.value}
+                  <div className="absolute -bottom-1 left-1/2 h-2 w-2 -translate-x-1/2 rotate-45 bg-gray-900" />
+                </motion.div>
+              )}
+            </div>
           ))}
         </div>
       </div>
 
       <div>
-        <label className="mb-3 block text-sm font-medium text-gray-700">
+        <div
+          className="mb-3 text-sm font-medium text-gray-700"
+          role="group"
+          aria-label="Preference"
+        >
           Interested in...
-        </label>
-        <div className="grid grid-cols-3 gap-3">
+        </div>
+        <div className="grid grid-cols-4 gap-3">
           {preferenceOptions.map((option) => (
-            <motion.button
-              key={option.value}
-              type="button"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => updateFormData('lookingFor', option.value)}
-              title={option.value}
-              className={`relative flex aspect-square items-center justify-center rounded-lg transition-all duration-200 ${
-                formData.lookingFor === option.value
-                  ? 'bg-gradient-to-r from-pink-500 to-purple-500 shadow-lg ring-2 ring-pink-500/50'
-                  : 'bg-white/60 ring-1 ring-zinc-950/10 hover:bg-white hover:ring-pink-500/30'
-              }`}
-            >
-              <span className="text-4xl">{option.icon}</span>
-            </motion.button>
+            <div key={option.value} className="relative">
+              <AnimatedButton
+                type="button"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => updateFormData('lookingFor', option.value)}
+                onMouseEnter={() =>
+                  setHoveredButton(`preference-${option.value}`)
+                }
+                onMouseLeave={() => setHoveredButton(null)}
+                className={`flex aspect-square w-full items-center justify-center rounded-lg transition-all duration-200 ${getColorClasses(
+                  option.value,
+                  formData.lookingFor === option.value
+                )}`}
+              >
+                {getIcon(option.value)}
+              </AnimatedButton>
+              {hoveredButton === `preference-${option.value}` && (
+                <motion.div
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.15 }}
+                  className="pointer-events-none absolute -top-10 left-1/2 z-10 -translate-x-1/2 rounded-md bg-gray-900 px-2 py-1 text-xs whitespace-nowrap text-white shadow-lg"
+                >
+                  {option.value}
+                  <div className="absolute -bottom-1 left-1/2 h-2 w-2 -translate-x-1/2 rotate-45 bg-gray-900" />
+                </motion.div>
+              )}
+            </div>
           ))}
         </div>
       </div>
@@ -445,9 +729,9 @@ function StepFour({ formData, setFormData, setError }: PhotoStepProps) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div>
-        <h2 className="mb-2 text-center text-2xl font-semibold text-gray-800">
+        <h2 className="mb-6 text-center text-2xl font-semibold text-gray-800">
           Add your photo
         </h2>
         <p className="text-center text-sm text-gray-600">
@@ -455,57 +739,57 @@ function StepFour({ formData, setFormData, setError }: PhotoStepProps) {
         </p>
       </div>
 
-      <PhotocardPreview
-        photoUrl={formData.photoUrl}
-        name={formData.name}
-        age={formData.age}
-        province={formData.province}
-        city={formData.city}
-      />
-
-      <div>
-        <label
-          htmlFor="photo-upload"
-          className="block w-full cursor-pointer rounded-lg border-2 border-dashed border-gray-300 bg-white/60 p-6 text-center transition-all duration-200 hover:border-pink-400 hover:bg-pink-50/50"
-        >
-          <div className="space-y-2">
-            <svg
-              className="mx-auto h-12 w-12 text-gray-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-              />
-            </svg>
-            <div className="text-sm text-gray-600">
-              {uploading ? (
-                <span className="font-medium text-pink-600">Uploading...</span>
-              ) : (
-                <>
-                  <span className="font-medium text-pink-600">
-                    Click to upload
-                  </span>
-                  {' or drag and drop'}
-                </>
-              )}
-            </div>
-            <p className="text-xs text-gray-500">PNG, JPG, WebP up to 5MB</p>
-          </div>
-          <input
-            id="photo-upload"
-            type="file"
-            accept="image/jpeg,image/jpg,image/png,image/webp"
-            onChange={handleFileUpload}
-            className="sr-only"
-            disabled={uploading}
+      {formData.photoUrl && (
+        <div className="flex justify-center">
+          <img
+            src={formData.photoUrl}
+            alt="Profile preview"
+            className="h-48 w-48 rounded-lg object-cover ring-1 ring-zinc-950/10"
           />
-        </label>
-      </div>
+        </div>
+      )}
+
+      <label
+        htmlFor="photo-upload"
+        className="block w-full cursor-pointer rounded-lg border-2 border-dashed border-gray-300 bg-white/60 p-6 text-center transition-all duration-200 hover:border-pink-400 hover:bg-pink-50/50"
+      >
+        <div className="space-y-2">
+          <svg
+            className="mx-auto h-12 w-12 text-gray-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+            />
+          </svg>
+          <div className="text-sm text-gray-600">
+            {uploading ? (
+              <span className="font-medium text-pink-600">Uploading...</span>
+            ) : (
+              <>
+                <span className="font-medium text-pink-600">
+                  Click to upload
+                </span>
+                {' or drag and drop'}
+              </>
+            )}
+          </div>
+          <p className="text-xs text-gray-500">PNG, JPG, WebP up to 5MB</p>
+        </div>
+        <input
+          id="photo-upload"
+          type="file"
+          accept="image/jpeg,image/jpg,image/png,image/webp"
+          onChange={handleFileUpload}
+          className="sr-only"
+          disabled={uploading}
+        />
+      </label>
     </div>
   );
 }

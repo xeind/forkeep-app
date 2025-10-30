@@ -117,13 +117,22 @@ export const api = {
   },
 
   users: {
-    discover: async (cursor?: string, limit = 10): Promise<{ users: User[]; nextCursor: string | null; hasMore: boolean }> => {
+    discover: async (
+      cursor?: string,
+      limit = 10
+    ): Promise<{
+      users: User[];
+      nextCursor: string | null;
+      hasMore: boolean;
+    }> => {
       const params = new URLSearchParams();
       if (cursor) params.append('cursor', cursor);
       params.append('limit', limit.toString());
-      
+
       const queryString = params.toString();
-      return authFetch(`/api/users/discover${queryString ? `?${queryString}` : ''}`);
+      return authFetch(
+        `/api/users/discover${queryString ? `?${queryString}` : ''}`
+      );
     },
   },
 
