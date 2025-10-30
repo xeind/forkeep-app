@@ -2,24 +2,30 @@ import { useState } from 'react';
 import { motion } from 'motion/react';
 
 interface AnimatedCheckboxProps {
+  checked?: boolean;
   defaultChecked?: boolean;
   onChange?: (checked: boolean) => void;
 }
 
 export default function AnimatedCheckbox({
+  checked: controlledChecked,
   defaultChecked = false,
   onChange,
 }: AnimatedCheckboxProps) {
-  const [checked, setChecked] = useState(defaultChecked);
+  const [internalChecked, setInternalChecked] = useState(defaultChecked);
+  const checked = controlledChecked !== undefined ? controlledChecked : internalChecked;
 
   const handleToggle = () => {
     const newChecked = !checked;
-    setChecked(newChecked);
+    if (controlledChecked === undefined) {
+      setInternalChecked(newChecked);
+    }
     onChange?.(newChecked);
   };
 
   return (
     <button
+      type="button"
       onClick={handleToggle}
       className="relative h-6 w-6 cursor-pointer"
       aria-checked={checked}

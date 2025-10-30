@@ -1,5 +1,5 @@
 import type { User } from '../lib/api';
-import { User as UserIcon } from 'lucide-react';
+import { User as UserIcon, Cake } from 'lucide-react';
 
 export function ProfileCardFront({ user }: { user: User }) {
   return (
@@ -24,7 +24,7 @@ export function ProfileCardFront({ user }: { user: User }) {
           </div>
 
           <div className="mb-2 flex items-center gap-2">
-            <span className="bold font-serif text-2xl font-normal text-[#8b7d6f]">
+            <span className="font-serif text-2xl font-normal text-[#8b7d6f] flex items-center">
               {user.age}
             </span>
             <div
@@ -41,6 +41,17 @@ export function ProfileCardFront({ user }: { user: User }) {
               <UserIcon className="h-3 w-3" />
               <span className="text-xs font-medium">{user.gender}</span>
             </div>
+            {user.birthday && (
+              <div className="inline-flex items-center gap-1 rounded-full px-2 py-1 bg-amber-100 text-amber-700">
+                <Cake className="h-3 w-3" />
+                <span className="text-xs font-medium">
+                  {new Date(user.birthday).toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric'
+                  })}
+                </span>
+              </div>
+            )}
           </div>
 
           {(user.city || user.province) && (
@@ -98,6 +109,18 @@ export function ProfileCardBack({ user }: { user: User }) {
               <span className="w-20 font-semibold text-[#6b5d4f]">Age:</span>
               <span className="text-[#8b7d6f]">{user.age}</span>
             </div>
+            {user.birthday && (
+              <div className="flex items-center gap-3 text-sm">
+                <span className="w-20 font-semibold text-[#6b5d4f]">Birthday:</span>
+                <span className="text-[#8b7d6f]">
+                  {new Date(user.birthday).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
+                </span>
+              </div>
+            )}
             {(user.city || user.province) && (
               <div className="flex items-center gap-3 text-sm">
                 <span className="w-20 font-semibold text-[#6b5d4f]">

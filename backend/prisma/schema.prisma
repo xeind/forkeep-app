@@ -60,6 +60,8 @@ model User {
   passwordHash     String
   name             String
   age              Int
+  birthday         DateTime?
+  showBirthday     Boolean   @default(false)
   gender           String
   lookingFor       String
   bio              String

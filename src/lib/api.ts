@@ -4,12 +4,15 @@ export interface User {
   id: string;
   name: string;
   age: number;
+  birthday?: string | null;
+  showBirthday?: boolean;
   gender: string;
   bio: string;
   photoUrl: string;
   photos?: string[];
   province?: string | null;
   city?: string | null;
+  lookingFor?: string;
 }
 
 export interface Match {
@@ -191,7 +194,7 @@ export const api = {
       return authFetch('/api/profile/me');
     },
 
-    updateMe: async (updates: Partial<User>) => {
+    updateMe: async (updates: Partial<User> & { birthday?: string | null; showBirthday?: boolean }) => {
       return authFetch('/api/profile/me', {
         method: 'PUT',
         body: JSON.stringify(updates),

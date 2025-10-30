@@ -85,17 +85,6 @@ export const getDiscoverUsers = async (req: Request, res: Response) => {
           lookingForFilter,
         ],
       },
-      select: {
-        id: true,
-        name: true,
-        age: true,
-        gender: true,
-        bio: true,
-        photoUrl: true,
-        photos: true,
-        province: true,
-        city: true,
-      },
     });
 
     const seededRandom = (seed: number) => {
@@ -128,8 +117,21 @@ export const getDiscoverUsers = async (req: Request, res: Response) => {
     const resultUsers = hasMore ? users.slice(0, limit) : users;
     const nextCursor = hasMore ? resultUsers[resultUsers.length - 1].id : null;
 
+    const usersWithPrivacy = resultUsers.map((user) => ({
+      id: user.id,
+      name: user.name,
+      age: user.age,
+      gender: user.gender,
+      bio: user.bio,
+      photoUrl: user.photoUrl,
+      photos: user.photos,
+      province: user.province,
+      city: user.city,
+      birthday: user.showBirthday ? user.birthday : null,
+    }));
+
     res.json({
-      users: resultUsers,
+      users: usersWithPrivacy,
       nextCursor,
       hasMore,
     });

@@ -47,7 +47,10 @@ export const getUserProfile = async (req: Request, res: Response) => {
     const { passwordHash, email, ...safeUser } = user;
 
     res.json({ 
-      user: safeUser
+      user: {
+        ...safeUser,
+        birthday: user.showBirthday ? user.birthday : null,
+      }
     });
   } catch (error) {
     console.error('Get user profile error:', error);
@@ -62,13 +65,15 @@ export const updateMyProfile = async (req: Request, res: Response) => {
     if (!userId) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
-    const { name, bio, age, photoUrl, photos, province, city } = req.body;
+    const { name, bio, age, birthday, showBirthday, photoUrl, photos, province, city } = req.body;
 
     const updateData: any = { updatedAt: new Date() };
 
     if (name !== undefined) updateData.name = name;
     if (bio !== undefined) updateData.bio = bio;
     if (age !== undefined) updateData.age = age;
+    if (birthday !== undefined) updateData.birthday = birthday ? new Date(birthday) : null;
+    if (showBirthday !== undefined) updateData.showBirthday = showBirthday;
     if (photoUrl !== undefined) updateData.photoUrl = photoUrl;
     if (photos !== undefined) updateData.photos = photos;
     if (province !== undefined) updateData.province = province;

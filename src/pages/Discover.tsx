@@ -173,27 +173,25 @@ export default function Discover() {
         setMatchId(result.matchId);
       }
 
-      // Delay incrementing index to allow exit animation to complete for all cards
-      setTimeout(() => {
-        setCurrentIndex((prev) => prev + 1);
-        if (isLastCard) {
-          setIsAnimatingLastCard(false);
-        }
-      }, 400); // Match the exit animation duration (0.3s + buffer)
+      // Increment index immediately - exit animation will handle visual transition
+      setCurrentIndex((prev) => prev + 1);
     } catch (error) {
       console.error('Swipe failed:', error);
-      setTimeout(() => {
-        setCurrentIndex((prev) => prev + 1);
-        if (isLastCard) {
-          setIsAnimatingLastCard(false);
-        }
-      }, 400);
+      setCurrentIndex((prev) => prev + 1);
     } finally {
-      setSwiping(false);
+      // Reset swiping state after animation completes
+      setTimeout(() => {
+        setSwiping(false);
+        setExitingCard(null);
+      }, 300); // Match the exit animation duration
     }
   };
 
-  const handleExitComplete = () => {};
+  const handleExitComplete = () => {
+    if (isAnimatingLastCard) {
+      setIsAnimatingLastCard(false);
+    }
+  };
 
   const closeMatchModal = () => {
     setMatchedUser(null);
@@ -218,7 +216,8 @@ export default function Discover() {
   const showEmptyState =
     (users.length === 0 || currentIndex >= users.length) &&
     !matchedUser &&
-    !isAnimatingLastCard;
+    !isAnimatingLastCard &&
+    !exitingCard;
   const currentUser = users[currentIndex];
   const nextUser =
     currentIndex + 1 < users.length ? users[currentIndex + 1] : null;
@@ -243,12 +242,14 @@ export default function Discover() {
         ) : currentUser ? (
           <div className="relative h-[600px] w-96">
             <AnimatePresence mode="popLayout">
-              <SwipeCard
-                key={nextUser ? nextUser.id : `${currentUser.id}-bg`}
-                user={nextUser || currentUser}
-                onSwipe={() => {}}
-                isBackground
-              />
+              {nextUser && (
+                <SwipeCard
+                  key={nextUser.id}
+                  user={nextUser}
+                  onSwipe={() => {}}
+                  isBackground
+                />
+              )}
 
               <SwipeCard
                 key={currentUser.id}

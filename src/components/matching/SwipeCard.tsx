@@ -170,7 +170,10 @@ export default function SwipeCard({
             <>
               <motion.div
                 style={{ opacity: likeOpacity }}
-                className="pointer-events-none absolute -inset-1 z-10 rounded-[28px] bg-red-500/5 blur-xl"
+                className="pointer-events-none absolute -inset-4 z-10 rounded-[32px] bg-red-500/20"
+                animate={{
+                  filter: 'blur(32px)',
+                }}
               />
 
               <motion.div
@@ -181,16 +184,10 @@ export default function SwipeCard({
                   className="absolute inset-0"
                   style={{
                     background:
-                      'radial-gradient(circle at center, transparent 0%, transparent 50%, rgba(239, 68, 68, 0.25) 75%, rgba(239, 68, 68, 0.4) 70%)',
+                      'radial-gradient(circle at center, transparent 0%, transparent 60%, rgba(239, 68, 68, 0.15) 85%, rgba(239, 68, 68, 0.25) 100%)',
+                    filter: 'blur(8px)',
                   }}
                 />
-              </motion.div>
-
-              <motion.div
-                style={{ opacity: likeOpacity }}
-                className="pointer-events-none absolute inset-0 z-20 overflow-hidden rounded-3xl"
-              >
-                <div className="absolute inset-y-0 right-0 w-32 bg-linear-to-l from-red-700/30 to-transparent" />
               </motion.div>
 
               <motion.div
