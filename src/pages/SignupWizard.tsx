@@ -398,6 +398,20 @@ function StepOne({ formData, updateFormData, updateBirthday }: StepProps) {
     setIsCalendarOpen(false);
   };
 
+  const getMaxBirthday = (): Date => {
+    const today = new Date();
+    const maxDate = new Date(
+      today.getFullYear() - 18,
+      today.getMonth(),
+      today.getDate()
+    );
+    return maxDate;
+  };
+
+  const getDefaultMonth = (): Date => {
+    return new Date(2000, 0, 1);
+  };
+
   return (
     <div className="space-y-4">
       <div>
@@ -442,15 +456,17 @@ function StepOne({ formData, updateFormData, updateBirthday }: StepProps) {
             <PopoverContent className="w-auto p-0" align="start">
               <Calendar
                 mode="single"
+                defaultMonth={formData.birthday || getDefaultMonth()}
                 selected={formData.birthday}
                 onSelect={handleBirthdaySelect}
-                disabled={(date) =>
-                  date > new Date() || date < new Date('1900-01-01')
-                }
-                initialFocus
+                disabled={{
+                  after: getMaxBirthday(),
+                  before: new Date(1900, 0, 1),
+                }}
                 captionLayout="dropdown"
                 fromYear={1924}
                 toYear={new Date().getFullYear()}
+                className="rounded-lg border shadow-sm"
               />
             </PopoverContent>
           </Popover>
