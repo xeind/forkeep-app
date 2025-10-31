@@ -8,7 +8,7 @@ type MotionButtonProps = React.ComponentProps<typeof Button> &
   VariantProps<typeof buttonVariants> & {
     enableHover?: boolean;
     enableTap?: boolean;
-    gradientStyle?: 'default' | 'brand';
+    gradientStyle?: 'default' | 'brand' | 'gray';
     buttonState?: 'idle' | 'loading' | 'success';
     loadingText?: string;
     successText?: string;
@@ -35,6 +35,7 @@ const MotionButton = forwardRef<HTMLButtonElement, MotionButtonProps>(
     const gradientClasses = {
       default: 'bg-linear-to-b from-[#1994ff] to-[#157cff]',
       brand: 'bg-linear-to-b from-[#FB64B6] to-[#E60076]',
+      gray: 'bg-linear-to-b from-[#6B7280] to-[#374151]',
     };
 
     const shadowClasses = {
@@ -42,6 +43,8 @@ const MotionButton = forwardRef<HTMLButtonElement, MotionButtonProps>(
         'shadow-[0px_0px_1px_1px_rgba(255,255,255,0.08)_inset,0px_1px_1.5px_0px_rgba(0,0,0,0.32),0px_0px_0px_0.5px_#1a94ff]',
       brand:
         'shadow-[0px_0px_1px_1px_rgba(255,255,255,0.08)_inset,0px_1px_1.5px_0px_rgba(0,0,0,0.32),0px_0px_0px_0.5px_#ec4899]',
+      gray:
+        'shadow-[0px_0px_1px_1px_rgba(255,255,255,0.08)_inset,0px_1px_1.5px_0px_rgba(0,0,0,0.32),0px_0px_0px_0.5px_#6B7280]',
     };
 
     const currentText =

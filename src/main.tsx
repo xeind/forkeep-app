@@ -18,6 +18,7 @@ import UserProfile from './pages/UserProfile.tsx';
 import Settings from './pages/Settings.tsx';
 import AppLayout from './components/AppLayout.tsx';
 import Navbar from './components/Navbar.tsx';
+import { ThemeProvider } from './contexts/ThemeContext.tsx';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const token = localStorage.getItem('forkeep_token');
@@ -122,7 +123,9 @@ function AppRoutes() {
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
-      <AppRoutes />
+      <ThemeProvider>
+        <AppRoutes />
+      </ThemeProvider>
     </BrowserRouter>
   </StrictMode>
 );

@@ -34,7 +34,7 @@ interface UserProfile {
   photos?: string[];
   province?: string | null;
   city?: string | null;
-  lookingFor: string;
+  lookingForGenders: string[];
 }
 
 export default function Profile() {
@@ -53,6 +53,8 @@ export default function Profile() {
     city: '',
     birthday: null as Date | null,
     showBirthday: false,
+    gender: '',
+    lookingForGenders: [] as string[],
   });
   const [photoData, setPhotoData] = useState({
     photoUrl: '',
@@ -78,10 +80,17 @@ export default function Profile() {
         city: data.user.city || '',
         birthday: data.user.birthday ? new Date(data.user.birthday) : null,
         showBirthday: data.user.showBirthday ?? false,
+        gender: data.user.gender || '',
+        lookingForGenders: data.user.lookingForGenders || [],
+      });
+      const photosArray = data.user.photos || [];
+      const displayPhotos = ['', '', ''];
+      photosArray.slice(0, 3).forEach((photo: string, i: number) => {
+        displayPhotos[i] = photo;
       });
       setPhotoData({
         photoUrl: data.user.photoUrl,
-        photos: data.user.photos || [],
+        photos: displayPhotos,
       });
     } catch (err) {
       console.error('Failed to fetch profile:', err);
@@ -109,16 +118,19 @@ export default function Profile() {
           await api.profile.updateMe({ photoUrl });
           setProfile((prev) => (prev ? { ...prev, photoUrl } : null));
         } else if (index !== undefined) {
-          setPhotoData((prev) => {
-            const newPhotos = [...prev.photos];
-            newPhotos[index] = photoUrl;
-            return { ...prev, photos: newPhotos };
-          });
-
           const newPhotos = [...photoData.photos];
           newPhotos[index] = photoUrl;
-          await api.profile.updateMe({ photos: newPhotos });
-          setProfile((prev) => (prev ? { ...prev, photos: newPhotos } : null));
+
+          setPhotoData((prev) => ({
+            ...prev,
+            photos: newPhotos,
+          }));
+
+          const filteredPhotos = newPhotos.filter((p) => p && p.trim() !== '');
+          await api.profile.updateMe({ photos: filteredPhotos });
+          setProfile((prev) =>
+            prev ? { ...prev, photos: filteredPhotos } : null
+          );
         }
       } catch (err) {
         console.error('Failed to upload photo:', err);
@@ -138,10 +150,14 @@ export default function Profile() {
 
   const handlePhotoDelete = async (index: number) => {
     try {
-      const newPhotos = photoData.photos.filter((_, i) => i !== index);
+      const newPhotos = [...photoData.photos];
+      newPhotos[index] = '';
+
       setPhotoData((prev) => ({ ...prev, photos: newPhotos }));
-      await api.profile.updateMe({ photos: newPhotos });
-      setProfile((prev) => (prev ? { ...prev, photos: newPhotos } : null));
+
+      const filteredPhotos = newPhotos.filter((p) => p && p.trim() !== '');
+      await api.profile.updateMe({ photos: filteredPhotos });
+      setProfile((prev) => (prev ? { ...prev, photos: filteredPhotos } : null));
     } catch (err) {
       console.error('Failed to delete photo:', err);
       setError('Failed to delete photo');
@@ -154,6 +170,18 @@ export default function Profile() {
     setSaving(true);
 
     try {
+      if (!formData.name.trim()) {
+        setError('Name is required');
+        setSaving(false);
+        return;
+      }
+
+      if (formData.name.length > 50) {
+        setError('Name must be 50 characters or less');
+        setSaving(false);
+        return;
+      }
+
       let ageNum: number | undefined;
 
       if (formData.birthday) {
@@ -190,6 +218,8 @@ export default function Profile() {
         city: formData.city || undefined,
         birthday: formData.birthday ? formData.birthday.toISOString() : null,
         showBirthday: formData.showBirthday,
+        gender: formData.gender,
+        lookingForGenders: formData.lookingForGenders,
       });
 
       await fetchProfile();
@@ -208,23 +238,8 @@ export default function Profile() {
     }
   };
 
-  const handleShowBirthdayToggle = async (checked: boolean) => {
-    const previousValue = formData.showBirthday;
-
+  const handleShowBirthdayToggle = (checked: boolean) => {
     setFormData((prev) => ({ ...prev, showBirthday: checked }));
-    setProfile((prev) => (prev ? { ...prev, showBirthday: checked } : null));
-
-    try {
-      await api.profile.updateMe({
-        showBirthday: checked,
-      });
-    } catch (err) {
-      console.error('Failed to update birthday visibility:', err);
-      setFormData((prev) => ({ ...prev, showBirthday: previousValue }));
-      setProfile((prev) =>
-        prev ? { ...prev, showBirthday: previousValue } : null
-      );
-    }
   };
 
   const previewProfile = useMemo(
@@ -232,11 +247,32 @@ export default function Profile() {
       profile
         ? {
             ...profile,
-            birthday: profile.showBirthday ? profile.birthday : null,
+            birthday: formData.showBirthday ? profile.birthday : null,
           }
         : profile,
-    [profile]
+    [profile, formData.showBirthday]
   );
+
+  const togglePreference = (value: string) => {
+    if (value === 'Everyone') {
+      setFormData({ ...formData, lookingForGenders: ['Everyone'] });
+    } else {
+      const currentPrefs = formData.lookingForGenders.filter(
+        (p) => p !== 'Everyone'
+      );
+      if (currentPrefs.includes(value)) {
+        setFormData({
+          ...formData,
+          lookingForGenders: currentPrefs.filter((p) => p !== value),
+        });
+      } else {
+        setFormData({
+          ...formData,
+          lookingForGenders: [...currentPrefs, value],
+        });
+      }
+    }
+  };
 
   if (loading) {
     return (
@@ -277,6 +313,17 @@ export default function Profile() {
             transition={{ duration: 0.2, ease: 'easeOut' }}
             className="flex flex-col items-center gap-6"
           >
+            <div className="flex flex-col items-center gap-2">
+              <h1
+                className="bg-linear-to-r from-gray-900 to-gray-700 bg-clip-text text-3xl font-bold text-transparent"
+                style={{
+                  fontFamily: "'Noto Serif', Georgia, 'Times New Roman', serif",
+                }}
+              >
+                Your Profile
+              </h1>
+              <p className="text-sm text-gray-600">Your card preview</p>
+            </div>
             <div className="relative h-[600px] w-96">
               <motion.div
                 onClick={handleCardClick}
@@ -523,7 +570,7 @@ export default function Profile() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.25, ease: 'easeOut' }}
-            className="mx-auto w-96"
+            className="mx-auto w-full max-w-2xl px-8"
           >
             <motion.div
               layout
@@ -544,16 +591,22 @@ export default function Profile() {
                   </motion.div>
                 )}
 
-                <FormInput
-                  id="name"
-                  label="Name"
-                  type="text"
-                  required
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
-                />
+                <div className="space-y-2">
+                  <FormInput
+                    id="name"
+                    label="Name"
+                    type="text"
+                    required
+                    value={formData.name}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
+                    maxLength={16}
+                  />
+                  <p className="text-right text-xs text-gray-500">
+                    {formData.name.length}/16 characters
+                  </p>
+                </div>
 
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-700">
@@ -650,6 +703,72 @@ export default function Profile() {
                   />
                 </div>
 
+                <div>
+                  <label className="mb-3 block text-sm font-medium text-gray-700">
+                    I am:
+                  </label>
+                  <div className="grid grid-cols-4 gap-3">
+                    {[
+                      { value: 'Men', color: 'blue' },
+                      { value: 'Women', color: 'pink' },
+                      { value: 'Non-binary', color: 'purple' },
+                      { value: 'Other', color: 'gray' },
+                    ].map((option) => (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() =>
+                          setFormData({ ...formData, gender: option.value })
+                        }
+                        className={`rounded-lg px-4 py-2 text-sm font-medium transition-all ${
+                          formData.gender === option.value
+                            ? option.color === 'blue'
+                              ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg ring-2 ring-blue-500/50'
+                              : option.color === 'pink'
+                                ? 'bg-gradient-to-r from-pink-500 to-pink-600 text-white shadow-lg ring-2 ring-pink-500/50'
+                                : option.color === 'purple'
+                                  ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-lg ring-2 ring-purple-500/50'
+                                  : 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-lg ring-2 ring-gray-500/50'
+                            : 'bg-white/60 text-gray-700 ring-1 ring-zinc-950/10 hover:bg-white hover:ring-pink-500/30'
+                        }`}
+                      >
+                        {option.value}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="mb-3 block text-sm font-medium text-gray-700">
+                    Interested in:
+                  </label>
+                  <div className="grid grid-cols-4 gap-3">
+                    {[
+                      { value: 'Men', color: 'blue' },
+                      { value: 'Women', color: 'pink' },
+                      { value: 'Non-binary', color: 'purple' },
+                      { value: 'Everyone', color: 'rainbow' },
+                    ].map((option) => (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => togglePreference(option.value)}
+                        className={`rounded-lg px-4 py-2 text-sm font-medium transition-all ${
+                          formData.lookingForGenders.includes(option.value)
+                            ? option.color === 'blue'
+                              ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg ring-2 ring-blue-500/50'
+                              : option.color === 'pink'
+                                ? 'bg-gradient-to-r from-pink-500 to-pink-600 text-white shadow-lg ring-2 ring-pink-500/50'
+                                : 'bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 text-white shadow-lg ring-2 ring-purple-500/50'
+                            : 'bg-white/60 text-gray-700 ring-1 ring-zinc-950/10 hover:bg-white hover:ring-pink-500/30'
+                        }`}
+                      >
+                        {option.value}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 <FormSelect
                   id="province"
                   label={
@@ -716,6 +835,8 @@ export default function Profile() {
                           ? new Date(profile.birthday)
                           : null,
                         showBirthday: profile.showBirthday ?? false,
+                        gender: profile.gender || '',
+                        lookingForGenders: profile.lookingForGenders || [],
                       });
                     }}
                     gradientStyle="brand"

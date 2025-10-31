@@ -68,7 +68,7 @@ export default function MatchModal({
     <DialogPrimitive.Root open={true} onOpenChange={handleClose}>
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/60 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
-        <DialogPrimitive.Content className="fixed top-[50%] left-[50%] z-[100] w-80 translate-x-[-50%] translate-y-[-50%] rounded-2xl border-0 bg-gradient-to-br from-pink-500 to-purple-600 p-8 text-center text-white shadow-xl data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 duration-200 sm:max-w-[20rem]">
+        <DialogPrimitive.Content className="fixed top-[50%] left-[50%] z-[100] w-80 translate-x-[-50%] translate-y-[-50%] rounded-3xl border-0 bg-linear-to-b from-[#FB64B6] to-[#E60076] p-8 text-center text-white shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 duration-200 sm:max-w-[20rem]">
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
@@ -79,7 +79,7 @@ export default function MatchModal({
               mass: 0.5,
             }}
           >
-            <h2 className="text-4xl font-bold">It's a Match!</h2>
+            <h2 className="font-serif text-4xl font-bold" style={{ fontFamily: "'Noto Serif', Georgia, 'Times New Roman', serif" }}>It's a Match!</h2>
             {showCounter && (
               <p className="mt-1 text-xs font-medium opacity-75">
                 {currentIndex + 1} of {totalMatches}
@@ -119,7 +119,8 @@ export default function MatchModal({
           >
             <motion.button
               onClick={handlePrimaryAction}
-              className="w-full rounded-full bg-white px-6 py-3 font-semibold text-purple-600 transition-all duration-200 ease-[cubic-bezier(0.215,0.61,0.355,1)]"
+              className="w-full rounded-md bg-white px-6 py-3 font-semibold text-[#E60076] transition-all duration-200 ease-[cubic-bezier(0.215,0.61,0.355,1)]"
+              style={{ fontFamily: "'Noto Serif', Georgia, 'Times New Roman', serif" }}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
@@ -128,7 +129,8 @@ export default function MatchModal({
 
             <motion.button
               onClick={handleClose}
-              className="w-full rounded-full border-2 border-white/50 bg-white/10 px-6 py-3 font-semibold text-white backdrop-blur-sm transition-all duration-200 ease-[cubic-bezier(0.215,0.61,0.355,1)]"
+              className="w-full rounded-md border-2 border-white/50 bg-white/10 px-6 py-3 font-semibold text-white backdrop-blur-sm transition-all duration-200 ease-[cubic-bezier(0.215,0.61,0.355,1)]"
+              style={{ fontFamily: "'Noto Serif', Georgia, 'Times New Roman', serif" }}
               whileHover={{
                 scale: 1.02,
                 backgroundColor: 'rgba(255,255,255,0.15)',

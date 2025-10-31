@@ -2,18 +2,20 @@ import { useState, useEffect } from 'react';
 import { AnimatePresence } from 'motion/react';
 import SwipeCard from '../components/matching/SwipeCard';
 import MatchModal from '../components/MatchModal';
-import LoadingState from '../components/common/LoadingState';
 import EmptyState from '../components/common/EmptyState';
 import { api, type User, type Match } from '../lib/api';
 
+// Cache users across component remounts
+let cachedUsers: User[] = [];
+
 export default function Discover() {
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<User[]>(cachedUsers);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(cachedUsers.length === 0);
   const [matchedUser, setMatchedUser] = useState<User | null>(null);
   const [matchId, setMatchId] = useState<string | null>(null);
-  const [imagesLoaded, setImagesLoaded] = useState(false);
-  const [initialLoad, setInitialLoad] = useState(true);
+  const [imagesLoaded, setImagesLoaded] = useState(cachedUsers.length > 0);
+  const [initialLoad, setInitialLoad] = useState(cachedUsers.length === 0);
   const [exitingCard, setExitingCard] = useState<{
     id: string;
     direction: 'left' | 'right';
@@ -24,7 +26,6 @@ export default function Discover() {
   const [swiping, setSwiping] = useState(false);
   const [unviewedMatches, setUnviewedMatches] = useState<Match[]>([]);
   const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
-  const [isAnimatingLastCard, setIsAnimatingLastCard] = useState(false);
 
   const BATCH_SIZE = 10;
   const FETCH_THRESHOLD = 3;
@@ -122,6 +123,7 @@ export default function Discover() {
     try {
       setLoading(true);
       const data = await api.users.discover(undefined, BATCH_SIZE);
+      cachedUsers = data.users;
       setUsers(data.users);
       setNextCursor(data.nextCursor);
       setHasMore(data.hasMore);
@@ -138,7 +140,9 @@ export default function Discover() {
     try {
       setFetchingMore(true);
       const data = await api.users.discover(nextCursor, BATCH_SIZE);
-      setUsers((prev) => [...prev, ...data.users]);
+      const updatedUsers = [...users, ...data.users];
+      cachedUsers = updatedUsers;
+      setUsers(updatedUsers);
       setNextCursor(data.nextCursor);
       setHasMore(data.hasMore);
     } catch (error) {
@@ -152,13 +156,8 @@ export default function Discover() {
     if (swiping) return;
 
     const currentUser = users[currentIndex];
-    const isLastCard = currentIndex === users.length - 1;
 
     console.log(`Swiped ${direction} on ${currentUser.name}`);
-
-    if (isLastCard) {
-      setIsAnimatingLastCard(true);
-    }
 
     setSwiping(true);
     setExitingCard({ id: currentUser.id, direction });
@@ -172,25 +171,24 @@ export default function Discover() {
         setMatchedUser(currentUser);
         setMatchId(result.matchId);
       }
-
-      // Increment index immediately - exit animation will handle visual transition
-      setCurrentIndex((prev) => prev + 1);
     } catch (error) {
       console.error('Swipe failed:', error);
-      setCurrentIndex((prev) => prev + 1);
+      // If already swiped, still animate card away (it shouldn't be in feed anyway)
     } finally {
-      // Reset swiping state after animation completes
-      setTimeout(() => {
-        setSwiping(false);
-        setExitingCard(null);
-      }, 300); // Match the exit animation duration
+      setSwiping(false);
     }
   };
 
   const handleExitComplete = () => {
-    if (isAnimatingLastCard) {
-      setIsAnimatingLastCard(false);
-    }
+    console.log('Exit complete');
+    // Increment index after exit animation completes
+    setCurrentIndex((prev) => {
+      const newIndex = prev + 1;
+      // Update cache to reflect swiped cards are gone
+      cachedUsers = users.slice(newIndex);
+      return newIndex;
+    });
+    setExitingCard(null);
   };
 
   const closeMatchModal = () => {
@@ -206,21 +204,24 @@ export default function Discover() {
     }
   };
 
-  // Always show loading state first to prevent any flashing
+  // Show nothing while loading to avoid skeleton flash
   if (loading || !imagesLoaded || initialLoad) {
-    return (
-      <LoadingState message="Loading profiles..." variant="profile-card" />
-    );
+    return <div className="flex h-screen items-center justify-center" />;
   }
 
   const showEmptyState =
     (users.length === 0 || currentIndex >= users.length) &&
     !matchedUser &&
-    !isAnimatingLastCard &&
-    !exitingCard;
-  const currentUser = users[currentIndex];
-  const nextUser =
-    currentIndex + 1 < users.length ? users[currentIndex + 1] : null;
+    !exitingCard &&
+    !loading &&
+    imagesLoaded &&
+    !initialLoad;
+
+  // Current card is always at currentIndex (exitingCard just controls animation)
+  const currentUser = currentIndex < users.length ? users[currentIndex] : null;
+  
+  // Next card (background) is always currentIndex + 1
+  const nextUser = currentIndex + 1 < users.length ? users[currentIndex + 1] : null;
 
   return (
     <>

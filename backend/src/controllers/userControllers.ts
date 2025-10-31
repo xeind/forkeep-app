@@ -15,7 +15,7 @@ export const getDiscoverUsers = async (req: Request, res: Response) => {
 
     const currentUser = await prisma.user.findUnique({
       where: { id: userId },
-      select: { lookingFor: true, gender: true },
+      select: { lookingForGenders: true, gender: true },
     });
 
     if (!currentUser) {
@@ -30,46 +30,62 @@ export const getDiscoverUsers = async (req: Request, res: Response) => {
     const swipedIds = swipedUserIds.map((swipe) => swipe.swipedId);
 
     // Filter: What gender identities does the current user want to see?
-    // lookingFor: "Men" | "Women" | "Everyone"
+    // lookingForGenders: ["Men", "Women", "Non-binary people", "Everyone"]
     // Maps to gender: "Male" | "Female" | "Non-binary" | "Other"
-    const normalizeGenderForMatching = (lookingFor: string): any => {
-      if (lookingFor === 'Everyone') {
-        return {}; // No filter, show all genders
+    const normalizeGenderForMatching = (lookingForArray: string[]): any => {
+      // If empty selection, show no one
+      if (!lookingForArray || lookingForArray.length === 0) {
+        return { gender: { in: [] } };
       }
 
-      if (lookingFor === 'Men') {
-        return {
-          gender: 'Male', // Show only people who identify as Male
-        };
+      // If "Everyone" is selected, show all genders
+      if (lookingForArray.includes('Everyone')) {
+        return {}; // No filter
       }
 
-      if (lookingFor === 'Women') {
-        return {
-          gender: 'Female', // Show only people who identify as Female
-        };
-      }
+      // Map preference labels to gender identities
+      const genderMap: Record<string, string> = {
+        'Men': 'Men',
+        'Women': 'Women',
+        'Non-binary': 'Non-binary',
+      };
 
-      return {}; // Fallback: show everyone
+      const genders = lookingForArray
+        .map(pref => genderMap[pref])
+        .filter(Boolean);
+
+      if (genders.length === 0) return { gender: { in: [] } };
+
+      return { gender: { in: genders } };
     };
 
     // Filter: Who should see the current user based on their gender identity?
-    // If user identifies as "Male", show them to people looking for "Men"
-    // If user identifies as "Female", show them to people looking for "Women"
-    // Always include people looking for "Everyone"
+    // If user identifies as "Male", show them to people looking for "Men" or "Everyone"
+    // If user identifies as "Female", show them to people looking for "Women" or "Everyone"
+    // Uses PostgreSQL array overlap operator (hasSome)
     const buildLookingForFilter = (userGender: string): any => {
-      const conditions: any[] = [{ lookingFor: 'Everyone' }];
+      // Map gender identity to preference label
+      const preferenceMap: Record<string, string> = {
+        'Men': 'Men',
+        'Women': 'Women',
+        'Non-binary': 'Non-binary',
+        'Other': 'Everyone', // Other identities only shown to "Everyone" selectors
+      };
 
-      if (userGender === 'Male') {
-        conditions.push({ lookingFor: 'Men' });
-      } else if (userGender === 'Female') {
-        conditions.push({ lookingFor: 'Women' });
+      const matchingPreferences: string[] = ['Everyone'];
+      const userPreference = preferenceMap[userGender];
+      if (userPreference && userPreference !== 'Everyone') {
+        matchingPreferences.push(userPreference);
       }
-      // Note: Non-binary and Other identities will only be shown to people looking for "Everyone"
 
-      return { OR: conditions };
+      return {
+        lookingForGenders: {
+          hasSome: matchingPreferences // PostgreSQL array overlap operator
+        }
+      };
     };
 
-    const genderFilter = normalizeGenderForMatching(currentUser.lookingFor);
+    const genderFilter = normalizeGenderForMatching(currentUser.lookingForGenders);
     const lookingForFilter = buildLookingForFilter(currentUser.gender);
 
     const allUsers = await prisma.user.findMany({
@@ -122,6 +138,7 @@ export const getDiscoverUsers = async (req: Request, res: Response) => {
       name: user.name,
       age: user.age,
       gender: user.gender,
+      lookingForGenders: user.lookingForGenders,
       bio: user.bio,
       photoUrl: user.photoUrl,
       photos: user.photos,

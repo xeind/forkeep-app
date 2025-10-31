@@ -6,11 +6,11 @@ import type { Request, Response } from 'express';
 
 export const signup = async (req: Request, res: Response) => {
   try {
-    const { email, password, name, age, gender, lookingFor, bio, photoUrl, province, city, photos } =
+    const { email, password, name, age, birthday, gender, lookingForGenders, bio, photoUrl, province, city, photos } =
       req.body;
 
     // Validation of required fields
-    if (!email || !password || !name || !age || !gender || !lookingFor) {
+    if (!email || !password || !name || !age || !gender || !lookingForGenders) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
@@ -22,8 +22,8 @@ export const signup = async (req: Request, res: Response) => {
     const passwordHash = await bcrypt.hash(password, 10);
 
     const photosArray = photos && Array.isArray(photos) && photos.length > 0
-      ? [photoUrl, ...photos].filter(Boolean)
-      : [photoUrl || 'https:i.pravatar.cc/400'];
+      ? photos.filter(Boolean)
+      : [];
 
     // Create User
     const user = await prisma.user.create({
@@ -33,8 +33,10 @@ export const signup = async (req: Request, res: Response) => {
         passwordHash,
         name,
         age,
+        birthday: birthday ? new Date(birthday) : null,
+        showBirthday: false,
         gender,
-        lookingFor,
+        lookingForGenders,
         bio: bio || '',
         photoUrl: photoUrl || 'https:i.pravatar.cc/400',
         photos: photosArray,

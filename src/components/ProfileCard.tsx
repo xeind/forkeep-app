@@ -1,9 +1,26 @@
 import type { User } from '../lib/api';
-import { User as UserIcon, Cake } from 'lucide-react';
+import { User as UserIcon, Cake, Search } from 'lucide-react';
+
+const formatPreferences = (lookingForGenders: string[]): string => {
+  if (lookingForGenders.includes('Everyone')) {
+    return 'Everyone';
+  }
+
+  const allOptions = ['Men', 'Women', 'Non-binary'];
+  const hasAll = allOptions.every((option) =>
+    lookingForGenders.includes(option)
+  );
+
+  if (hasAll) {
+    return 'Everyone';
+  }
+
+  return lookingForGenders.join(' + ');
+};
 
 export function ProfileCardFront({ user }: { user: User }) {
   return (
-    <div className="absolute h-[600px] w-96 overflow-hidden rounded-3xl bg-[#FCFBF7] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] ring-1 ring-zinc-600/20 select-none">
+    <div className="absolute h-[600px] w-96 overflow-hidden rounded-3xl bg-[#F5F5F5] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] ring-1 ring-zinc-600/20 select-none">
       <div className="relative h-[450px] w-full p-3">
         <div className="h-full w-full overflow-hidden rounded-tl-[20px] rounded-tr-[20px] rounded-br-md rounded-bl-md ring-1 ring-zinc-950/20">
           <img
@@ -24,7 +41,7 @@ export function ProfileCardFront({ user }: { user: User }) {
           </div>
 
           <div className="mb-2 flex items-center gap-2">
-            <span className="font-serif text-2xl font-normal text-[#8b7d6f] flex items-center">
+            <span className="flex items-center font-serif text-2xl font-normal text-[#8b7d6f]">
               {user.age}
             </span>
             <div
@@ -41,13 +58,21 @@ export function ProfileCardFront({ user }: { user: User }) {
               <UserIcon className="h-3 w-3" />
               <span className="text-xs font-medium">{user.gender}</span>
             </div>
+            {user.lookingForGenders && user.lookingForGenders.length > 0 && (
+              <div className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2 py-1 text-gray-700">
+                <Search className="h-3 w-3" />
+                <span className="text-xs font-medium">
+                  {formatPreferences(user.lookingForGenders)}
+                </span>
+              </div>
+            )}
             {user.birthday && (
-              <div className="inline-flex items-center gap-1 rounded-full px-2 py-1 bg-amber-100 text-amber-700">
+              <div className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-1 text-amber-700">
                 <Cake className="h-3 w-3" />
                 <span className="text-xs font-medium">
                   {new Date(user.birthday).toLocaleDateString('en-US', {
                     month: 'short',
-                    day: 'numeric'
+                    day: 'numeric',
                   })}
                 </span>
               </div>
@@ -75,19 +100,22 @@ export function ProfileCardFront({ user }: { user: User }) {
 
 export function ProfileCardBack({ user }: { user: User }) {
   return (
-    <div className="absolute h-[600px] w-96 overflow-hidden rounded-3xl bg-[#f7f7f7] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] ring-1 ring-zinc-950/20 select-none">
+    <div className="absolute h-[600px] w-96 overflow-hidden rounded-3xl bg-[#FCFBF7] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] ring-1 ring-zinc-950/20 select-none">
       <div
-        className="pointer-events-none absolute inset-0 opacity-[0.30]"
+        className="pointer-events-none absolute inset-0 opacity-[0.15]"
         style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='2.5' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
           backgroundRepeat: 'repeat',
-          mixBlendMode: 'lighten',
+          mixBlendMode: 'multiply',
         }}
       />
       <div className="relative z-10 flex h-full flex-col p-8">
         <div className="mb-6">
-          <h3 className="mb-2 font-serif text-2xl font-bold text-[#6b5d4f]">
-            About {user.name}
+          <h3
+            className="mb-2 text-3xl font-bold text-[#6b5d4f]"
+            style={{ fontFamily: 'cursive' }}
+          >
+            About Me
           </h3>
           <div className="h-px bg-linear-to-r from-[#d4a5a5] via-[#d4c5b0] to-transparent" />
         </div>
@@ -109,14 +137,26 @@ export function ProfileCardBack({ user }: { user: User }) {
               <span className="w-20 font-semibold text-[#6b5d4f]">Age:</span>
               <span className="text-[#8b7d6f]">{user.age}</span>
             </div>
+            {user.lookingForGenders && user.lookingForGenders.length > 0 && (
+              <div className="flex items-center gap-3 text-sm">
+                <span className="w-20 font-semibold text-[#6b5d4f]">
+                  Looking for:
+                </span>
+                <span className="font-medium text-[#8b7d6f]">
+                  {formatPreferences(user.lookingForGenders)}
+                </span>
+              </div>
+            )}
             {user.birthday && (
               <div className="flex items-center gap-3 text-sm">
-                <span className="w-20 font-semibold text-[#6b5d4f]">Birthday:</span>
+                <span className="w-20 font-semibold text-[#6b5d4f]">
+                  Birthday:
+                </span>
                 <span className="text-[#8b7d6f]">
                   {new Date(user.birthday).toLocaleDateString('en-US', {
                     year: 'numeric',
                     month: 'long',
-                    day: 'numeric'
+                    day: 'numeric',
                   })}
                 </span>
               </div>
@@ -135,25 +175,28 @@ export function ProfileCardBack({ user }: { user: User }) {
             )}
           </div>
 
-          {user.photos && user.photos.length > 1 && (
+          {user.photos && user.photos.length > 0 && (
             <div className="mt-6">
               <h4 className="mb-3 text-sm font-semibold tracking-wide text-[#a8998a] uppercase">
                 More Photos
               </h4>
               <div className="grid grid-cols-3 gap-2">
-                {user.photos.slice(0, 6).map((photo, i) => (
-                  <div
-                    key={i}
-                    className="aspect-square overflow-hidden rounded-xl ring-1 ring-[#d4c5b0]/30"
-                  >
-                    <img
-                      src={photo}
-                      alt={`${user.name} ${i + 1}`}
-                      className="h-full w-full object-cover"
-                      draggable={false}
-                    />
-                  </div>
-                ))}
+                {user.photos
+                  .filter((photo) => photo && photo.trim() !== '')
+                  .slice(0, 6)
+                  .map((photo, i) => (
+                    <div
+                      key={i}
+                      className="aspect-square overflow-hidden rounded-xl ring-1 ring-[#d4c5b0]/30"
+                    >
+                      <img
+                        src={photo}
+                        alt={`${user.name} ${i + 1}`}
+                        className="h-full w-full object-cover"
+                        draggable={false}
+                      />
+                    </div>
+                  ))}
               </div>
             </div>
           )}

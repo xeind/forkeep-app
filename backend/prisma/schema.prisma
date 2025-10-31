@@ -60,17 +60,17 @@ model User {
   passwordHash     String
   name             String
   age              Int
-  birthday         DateTime?
-  showBirthday     Boolean   @default(false)
   gender           String
-  lookingFor       String
+  lookingForGenders String[]
   bio              String
   photoUrl         String
   photos           String[]
-  province         String?
-  city             String?
   createdAt        DateTime  @default(now())
   updatedAt        DateTime
+  province         String?
+  city             String?
+  birthday         DateTime?
+  showBirthday     Boolean   @default(false)
   matchesAsUser1   Match[]   @relation("Match_user1IdToUser")
   matchesAsUser2   Match[]   @relation("Match_user2IdToUser")
   messagesReceived Message[] @relation("Message_receiverIdToUser")
@@ -78,5 +78,6 @@ model User {
   swipesReceived   Swipe[]   @relation("Swipe_swipedIdToUser")
   swipesMade       Swipe[]   @relation("Swipe_swiperIdToUser")
 
-  @@index([gender, lookingFor])
+  @@index([gender])
+  @@index([lookingForGenders])
 }

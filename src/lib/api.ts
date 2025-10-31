@@ -2,6 +2,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 export interface User {
   id: string;
+  email?: string;
   name: string;
   age: number;
   birthday?: string | null;
@@ -12,7 +13,7 @@ export interface User {
   photos?: string[];
   province?: string | null;
   city?: string | null;
-  lookingFor?: string;
+  lookingForGenders?: string[];
 }
 
 export interface Match {
@@ -98,8 +99,9 @@ export const api = {
       password: string;
       name: string;
       age: number;
+      birthday?: string;
       gender: string;
-      lookingFor: string;
+      lookingForGenders: string[];
       bio: string;
       photoUrl: string;
       province?: string;

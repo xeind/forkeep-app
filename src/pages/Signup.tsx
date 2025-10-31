@@ -54,7 +54,7 @@ export default function Signup() {
         name,
         age: ageNum,
         gender: 'Other',
-        lookingFor: 'Everyone',
+        lookingForGenders: ['Everyone'],
         bio,
         photoUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + email,
       });

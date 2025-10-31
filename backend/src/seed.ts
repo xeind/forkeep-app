@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
+import { randomUUID } from 'crypto';
 
 const prisma = new PrismaClient();
 
@@ -70,10 +71,11 @@ function randomAge(): number {
 }
 
 async function createUser(name: string, gender: string) {
-  const lookingFor = gender === 'male' ? 'female' : 'male';
+  const lookingForGenders = gender === 'Men' ? ['Women'] : ['Men'];
   const age = randomAge();
   const bio = randomItem(bioTemplates);
   const location = randomItem(locations);
+  const [city, province] = location.split(', ');
   const photoUrl = `https://i.pravatar.cc/300?u=${name.toLowerCase()}`;
   const photos = [
     photoUrl,
@@ -83,19 +85,25 @@ async function createUser(name: string, gender: string) {
   
   const passwordHash = await bcrypt.hash('password123', 10);
   const email = `${name.toLowerCase()}@forkeep.app`;
+  const birthday = new Date(1990 + Math.floor(Math.random() * 15), Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1);
 
   return prisma.user.create({
     data: {
+      id: randomUUID(),
       email,
       passwordHash,
       name,
       age,
+      birthday,
+      showBirthday: false,
       gender,
-      lookingFor,
+      lookingForGenders,
       bio,
       photoUrl,
       photos,
-      location
+      province,
+      city,
+      updatedAt: new Date()
     }
   });
 }
@@ -114,15 +122,15 @@ async function main() {
   const users = [];
 
   for (const name of maleNames) {
-    const user = await createUser(name, 'male');
+    const user = await createUser(name, 'Men');
     users.push(user);
-    console.log(`  ✓ Created male user: ${name} (${user.age}, ${user.location})`);
+    console.log(`  ✓ Created male user: ${name} (${user.age}, ${user.city})`);
   }
 
   for (const name of femaleNames) {
-    const user = await createUser(name, 'female');
+    const user = await createUser(name, 'Women');
     users.push(user);
-    console.log(`  ✓ Created female user: ${name} (${user.age}, ${user.location})`);
+    console.log(`  ✓ Created female user: ${name} (${user.age}, ${user.city})`);
   }
 
   console.log(`\n✅ Created ${users.length} users\n`);
@@ -133,8 +141,9 @@ async function main() {
 
   for (let i = 0; i < 20; i++) {
     const swiper = randomItem(users);
+    const swiperPreference = swiper.gender === 'Male' ? 'Female' : 'Male';
     const potentialMatches = users.filter(
-      u => u.id !== swiper.id && u.gender === swiper.lookingFor
+      u => u.id !== swiper.id && u.gender === swiperPreference
     );
     
     if (potentialMatches.length > 0) {
@@ -144,6 +153,7 @@ async function main() {
       try {
         await prisma.swipe.create({
           data: {
+            id: randomUUID(),
             swiperId: swiper.id,
             swipedId: swiped.id,
             direction
@@ -168,6 +178,7 @@ async function main() {
 
             await prisma.match.create({
               data: {
+      id: randomUUID(),
                 user1Id,
                 user2Id
               }

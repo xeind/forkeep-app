@@ -12,10 +12,14 @@ import FormTextarea from '@/components/FormTextarea';
 import FormSelect from '@/components/FormSelect';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertCircle, CalendarIcon } from 'lucide-react';
+import { AlertCircle, CalendarIcon, Eye, EyeOff } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
@@ -27,10 +31,11 @@ interface SignupFormData {
   province: string;
   city: string;
   gender: string;
-  lookingFor: string;
+  lookingForGenders: string[];
   bio: string;
   email: string;
   password: string;
+  confirmPassword: string;
   photoUrl: string;
   photos: string[];
 }
@@ -53,10 +58,11 @@ export default function SignupWizard() {
     province: '',
     city: '',
     gender: 'Other',
-    lookingFor: 'Everyone',
+    lookingForGenders: [],
     bio: '',
     email: '',
     password: '',
+    confirmPassword: '',
     photoUrl: '',
     photos: [],
   });
@@ -92,6 +98,10 @@ export default function SignupWizard() {
         return true;
 
       case 2:
+        if (formData.lookingForGenders.length === 0) {
+          setError('Please select at least one preference');
+          return false;
+        }
         return true;
 
       case 3:
@@ -130,6 +140,14 @@ export default function SignupWizard() {
         }
         if (formData.password.length < 8) {
           setError('Password must be at least 8 characters');
+          return false;
+        }
+        if (!formData.confirmPassword) {
+          setError('Please confirm your password');
+          return false;
+        }
+        if (formData.password !== formData.confirmPassword) {
+          setError('Passwords do not match');
           return false;
         }
         return true;
@@ -182,8 +200,11 @@ export default function SignupWizard() {
         password: formData.password,
         name: formData.name,
         age: ageNum,
+        birthday: formData.birthday
+          ? formData.birthday.toISOString()
+          : undefined,
         gender: formData.gender,
-        lookingFor: formData.lookingFor,
+        lookingForGenders: formData.lookingForGenders,
         bio: formData.bio,
         province: formData.province || undefined,
         city: formData.city || undefined,
@@ -275,6 +296,7 @@ export default function SignupWizard() {
                     <StepTwo
                       formData={formData}
                       updateFormData={updateFormData}
+                      setFormData={setFormData}
                     />
                   )}
                   {currentStep === 3 && (
@@ -360,6 +382,7 @@ interface StepProps {
   formData: SignupFormData;
   updateFormData: (field: keyof SignupFormData, value: string) => void;
   updateBirthday?: (date: Date | undefined) => void;
+  setFormData?: React.Dispatch<React.SetStateAction<SignupFormData>>;
 }
 
 interface PhotoStepProps {
@@ -380,7 +403,7 @@ function StepOne({ formData, updateFormData, updateBirthday }: StepProps) {
     const age = today.getFullYear() - birthday.getFullYear();
     const monthDiff = today.getMonth() - birthday.getMonth();
     const dayDiff = today.getDate() - birthday.getDate();
-    
+
     if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
       return age - 1;
     }
@@ -421,18 +444,27 @@ function StepOne({ formData, updateFormData, updateBirthday }: StepProps) {
       </div>
 
       <div className="space-y-4">
-        <FormInput
-          id="name"
-          label="Name"
-          type="text"
-          required
-          value={formData.name}
-          onChange={(e) => updateFormData('name', e.target.value)}
-          placeholder="Your name"
-        />
+        <div className="space-y-1">
+          <FormInput
+            id="name"
+            label="Name"
+            type="text"
+            required
+            maxLength={16}
+            value={formData.name}
+            onChange={(e) => updateFormData('name', e.target.value)}
+            placeholder="Your name"
+          />
+          <p className="text-right text-xs text-gray-500">
+            {formData.name.length}/16 characters
+          </p>
+        </div>
 
         <div>
-          <label htmlFor="birthday" className="mb-2 block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="birthday"
+            className="mb-2 block text-sm font-medium text-gray-700"
+          >
             Birthday <span className="text-red-500">*</span>
           </label>
           <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
@@ -441,7 +473,7 @@ function StepOne({ formData, updateFormData, updateBirthday }: StepProps) {
                 id="birthday"
                 variant="outline"
                 className={cn(
-                  'w-full justify-start text-left font-normal h-11 px-3 rounded-lg',
+                  'h-11 w-full justify-start rounded-lg px-3 text-left font-normal',
                   !formData.birthday && 'text-muted-foreground'
                 )}
               >
@@ -515,12 +547,12 @@ function StepOne({ formData, updateFormData, updateBirthday }: StepProps) {
   );
 }
 
-function StepTwo({ formData, updateFormData }: StepProps) {
+function StepTwo({ formData, updateFormData, setFormData }: StepProps) {
   const [hoveredButton, setHoveredButton] = useState<string | null>(null);
 
   const genderOptions = [
-    { value: 'Male' },
-    { value: 'Female' },
+    { value: 'Men' },
+    { value: 'Women' },
     { value: 'Non-binary' },
     { value: 'Other' },
   ];
@@ -528,10 +560,27 @@ function StepTwo({ formData, updateFormData }: StepProps) {
   const preferenceOptions = [
     { value: 'Men' },
     { value: 'Women' },
+    { value: 'Non-binary' },
     { value: 'Everyone' },
   ];
 
   const AnimatedButton = motion.create('button');
+
+  const togglePreference = (value: string) => {
+    if (!setFormData) return;
+    if (value === 'Everyone') {
+      setFormData((prev) => ({ ...prev, lookingForGenders: ['Everyone'] }));
+    } else {
+      setFormData((prev) => {
+        const currentPrefs = prev.lookingForGenders.filter((p: string) => p !== 'Everyone');
+        if (currentPrefs.includes(value)) {
+          return { ...prev, lookingForGenders: currentPrefs.filter((p: string) => p !== value) };
+        } else {
+          return { ...prev, lookingForGenders: [...currentPrefs, value] };
+        }
+      });
+    }
+  };
 
   const getColorClasses = (value: string, isSelected: boolean) => {
     if (!isSelected) {
@@ -539,10 +588,7 @@ function StepTwo({ formData, updateFormData }: StepProps) {
     }
 
     const colorMap: Record<string, string> = {
-      Male: 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-[0_0_0_1px_rgba(59,130,246,0.1),0_2px_8px_rgba(59,130,246,0.3),0_0_20px_rgba(59,130,246,0.15)] ring-2 ring-blue-500/50',
       Men: 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-[0_0_0_1px_rgba(59,130,246,0.1),0_2px_8px_rgba(59,130,246,0.3),0_0_20px_rgba(59,130,246,0.15)] ring-2 ring-blue-500/50',
-      Female:
-        'bg-gradient-to-r from-pink-500 to-pink-600 text-white shadow-[0_0_0_1px_rgba(236,72,153,0.1),0_2px_8px_rgba(236,72,153,0.3),0_0_20px_rgba(236,72,153,0.15)] ring-2 ring-pink-500/50',
       Women:
         'bg-gradient-to-r from-pink-500 to-pink-600 text-white shadow-[0_0_0_1px_rgba(236,72,153,0.1),0_2px_8px_rgba(236,72,153,0.3),0_0_20px_rgba(236,72,153,0.15)] ring-2 ring-pink-500/50',
       'Non-binary':
@@ -561,7 +607,7 @@ function StepTwo({ formData, updateFormData }: StepProps) {
 
   const getIcon = (value: string) => {
     const icons = {
-      Male: (
+      Men: (
         <svg
           className="h-8 w-8"
           viewBox="0 0 24 24"
@@ -574,7 +620,7 @@ function StepTwo({ formData, updateFormData }: StepProps) {
           <polyline points="16 4 20 4 20 8" />
         </svg>
       ),
-      Female: (
+      Women: (
         <svg
           className="h-8 w-8"
           viewBox="0 0 24 24"
@@ -611,32 +657,6 @@ function StepTwo({ formData, updateFormData }: StepProps) {
           strokeWidth="2"
         >
           <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-        </svg>
-      ),
-      Men: (
-        <svg
-          className="h-8 w-8"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
-          <circle cx="10" cy="14" r="6" />
-          <line x1="14.5" y1="9.5" x2="20" y2="4" />
-          <polyline points="16 4 20 4 20 8" />
-        </svg>
-      ),
-      Women: (
-        <svg
-          className="h-8 w-8"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
-          <circle cx="12" cy="8" r="6" />
-          <line x1="12" y1="14" x2="12" y2="22" />
-          <line x1="9" y1="19" x2="15" y2="19" />
         </svg>
       ),
       Everyone: (
@@ -722,14 +742,14 @@ function StepTwo({ formData, updateFormData }: StepProps) {
                 type="button"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => updateFormData('lookingFor', option.value)}
+                onClick={() => togglePreference(option.value)}
                 onMouseEnter={() =>
                   setHoveredButton(`preference-${option.value}`)
                 }
                 onMouseLeave={() => setHoveredButton(null)}
                 className={`flex aspect-square w-full items-center justify-center rounded-lg transition-all duration-200 ${getColorClasses(
                   option.value,
-                  formData.lookingFor === option.value
+                  formData.lookingForGenders.includes(option.value)
                 )}`}
               >
                 {getIcon(option.value)}
@@ -1034,6 +1054,9 @@ function StepFive({ formData, setFormData, setError }: PhotoStepProps) {
 }
 
 function StepSix({ formData, updateFormData }: StepProps) {
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   return (
     <div className="space-y-4">
       <div>
@@ -1053,17 +1076,68 @@ function StepSix({ formData, updateFormData }: StepProps) {
       />
 
       <div>
-        <FormInput
-          id="password"
-          label="Password"
-          type="password"
-          required
-          minLength={8}
-          value={formData.password}
-          onChange={(e) => updateFormData('password', e.target.value)}
-          placeholder="••••••••"
-        />
+        <label
+          htmlFor="password"
+          className="mb-2 block text-sm font-medium text-gray-700"
+        >
+          Password <span className="text-red-500">*</span>
+        </label>
+        <div className="relative">
+          <input
+            id="password"
+            type={showPassword ? 'text' : 'password'}
+            required
+            minLength={8}
+            value={formData.password}
+            onChange={(e) => updateFormData('password', e.target.value)}
+            placeholder="••••••••"
+            className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 pr-10 text-gray-900 placeholder-gray-400 shadow-sm transition-all duration-200 focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20 focus:outline-none"
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-400 transition-colors duration-200 hover:text-gray-600"
+          >
+            {showPassword ? (
+              <EyeOff className="h-5 w-5" />
+            ) : (
+              <Eye className="h-5 w-5" />
+            )}
+          </button>
+        </div>
         <p className="mt-1 text-xs text-gray-500">Minimum 8 characters</p>
+      </div>
+
+      <div>
+        <label
+          htmlFor="confirmPassword"
+          className="mb-2 block text-sm font-medium text-gray-700"
+        >
+          Confirm Password <span className="text-red-500">*</span>
+        </label>
+        <div className="relative">
+          <input
+            id="confirmPassword"
+            type={showConfirmPassword ? 'text' : 'password'}
+            required
+            minLength={8}
+            value={formData.confirmPassword}
+            onChange={(e) => updateFormData('confirmPassword', e.target.value)}
+            placeholder="••••••••"
+            className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 pr-10 text-gray-900 placeholder-gray-400 shadow-sm transition-all duration-200 focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20 focus:outline-none"
+          />
+          <button
+            type="button"
+            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+            className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-400 transition-colors duration-200 hover:text-gray-600"
+          >
+            {showConfirmPassword ? (
+              <EyeOff className="h-5 w-5" />
+            ) : (
+              <Eye className="h-5 w-5" />
+            )}
+          </button>
+        </div>
       </div>
     </div>
   );

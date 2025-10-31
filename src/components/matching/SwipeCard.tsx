@@ -4,7 +4,7 @@ import {
   useTransform,
   type PanInfo,
 } from 'motion/react';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { ProfileCardFront, ProfileCardBack } from '../ProfileCard';
 import { type User } from '../../lib/api';
 
@@ -29,6 +29,16 @@ export default function SwipeCard({
   const [isFlipping, setIsFlipping] = useState(false);
   const isDraggingRef = useRef(false);
   const dragStartY = useRef(0);
+
+  // Trigger onExitComplete when exit animation finishes
+  useEffect(() => {
+    if (exitDirection && onExitComplete) {
+      const timer = setTimeout(() => {
+        onExitComplete();
+      }, 300); // Match exit animation duration
+      return () => clearTimeout(timer);
+    }
+  }, [exitDirection, onExitComplete]);
 
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -58,6 +68,9 @@ export default function SwipeCard({
 
     if (Math.abs(info.offset.x) > swipeThreshold) {
       const direction = info.offset.x > 0 ? 'right' : 'left';
+      // Keep the card at its current position for smooth exit animation
+      x.stop();
+      y.stop();
       onSwipe(direction);
     }
 
@@ -79,7 +92,7 @@ export default function SwipeCard({
 
       setTimeout(() => {
         setIsFlipping(false);
-      }, 600);
+      }, 500);
     }
   };
 
@@ -117,18 +130,24 @@ export default function SwipeCard({
           ? 1000
           : -1000;
 
+  // Use animate prop to trigger exit when exitDirection is set
+  // Continue from current position by getting x value when exit starts
+  const animateState = exitDirection
+    ? { x: exitX, opacity: 0, scale: 1 }
+    : { x: 0, y: 0, scale: 1, opacity: 1 };
+
   return (
     <motion.div
       style={{ x, y }}
-      drag={!isFlipping}
+      drag={!isFlipping && !exitDirection}
       dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
       dragElastic={1}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       onClick={handleClick}
-      className={`absolute inset-0 ${!isFlipping ? 'cursor-grab active:cursor-grabbing' : 'cursor-pointer'}`}
+      className={`absolute inset-0 ${!isFlipping && !exitDirection ? 'cursor-grab active:cursor-grabbing' : 'cursor-pointer'}`}
       initial={{ scale: 0.95, opacity: 0.8 }}
-      animate={{ scale: 1, opacity: 1 }}
+      animate={animateState}
       exit={{
         x: exitX,
         opacity: 0,
@@ -143,91 +162,97 @@ export default function SwipeCard({
         }
       }}
       whileDrag={{ scale: 1.05 }}
-      transition={{
-        type: 'spring',
-        stiffness: 120,
-        damping: 20,
-        mass: 0.8,
-        duration: 0.6,
-      }}
+      transition={
+        exitDirection
+          ? {
+              duration: 0.3,
+              ease: [0.215, 0.61, 0.355, 1],
+            }
+          : {
+              type: 'spring',
+              stiffness: 120,
+              damping: 20,
+              mass: 0.8,
+              duration: 0.6,
+            }
+      }
     >
       <motion.div
         className="relative h-full w-full"
         style={{
-          perspective: '1000px',
+          rotate,
+          rotateX,
+          filter: cardFilter,
         }}
       >
+        {!isFlipping && (
+          <>
+            <motion.div
+              style={{ opacity: likeOpacity }}
+              className="pointer-events-none absolute -inset-4 z-10 rounded-[32px] bg-red-500/20"
+              animate={{
+                filter: 'blur(32px)',
+              }}
+            />
+
+            <motion.div
+              style={{ opacity: likeOpacity }}
+              className="pointer-events-none absolute inset-0 z-5 overflow-hidden rounded-3xl"
+            >
+              <div
+                className="absolute inset-0"
+                style={{
+                  background:
+                    'radial-gradient(circle at center, transparent 0%, transparent 60%, rgba(239, 68, 68, 0.15) 85%, rgba(239, 68, 68, 0.25) 100%)',
+                  filter: 'blur(8px)',
+                }}
+              />
+            </motion.div>
+
+            <motion.div
+              style={{ opacity: likeOpacity }}
+              className="pointer-events-none absolute right-12 bottom-16 z-30"
+            >
+              <motion.svg
+                width="120"
+                height="120"
+                viewBox="0 0 180 180"
+                className="drop-shadow-[0_0_20px_rgba(220,38,38,0.6)]"
+                style={{ rotate: -15 }}
+              >
+                <path
+                  d="M90 150c-3.5 0-6.5-2-8-5-15-30-45-50-45-75 0-20 15-35 35-35 10 0 18 4 23 10 5-6 13-10 23-10 20 0 35 15 35 35 0 25-30 45-45 75-1.5 3-4.5 5-8 5z"
+                  fill="#dc2626"
+                  opacity="0.9"
+                />
+                <ellipse
+                  cx="90"
+                  cy="90"
+                  rx="85"
+                  ry="88"
+                  fill="none"
+                  stroke="#dc2626"
+                  strokeWidth="8"
+                  opacity="0.7"
+                />
+              </motion.svg>
+            </motion.div>
+          </>
+        )}
+
         <motion.div
           className="relative h-full w-full"
           style={{
-            rotate,
-            rotateX,
-            transformStyle: 'preserve-3d',
-            filter: cardFilter,
+            perspective: '1000px',
           }}
         >
-          {!isFlipping && (
-            <>
-              <motion.div
-                style={{ opacity: likeOpacity }}
-                className="pointer-events-none absolute -inset-4 z-10 rounded-[32px] bg-red-500/20"
-                animate={{
-                  filter: 'blur(32px)',
-                }}
-              />
-
-              <motion.div
-                style={{ opacity: likeOpacity }}
-                className="pointer-events-none absolute inset-0 z-5 overflow-hidden rounded-3xl"
-              >
-                <div
-                  className="absolute inset-0"
-                  style={{
-                    background:
-                      'radial-gradient(circle at center, transparent 0%, transparent 60%, rgba(239, 68, 68, 0.15) 85%, rgba(239, 68, 68, 0.25) 100%)',
-                    filter: 'blur(8px)',
-                  }}
-                />
-              </motion.div>
-
-              <motion.div
-                style={{ opacity: likeOpacity }}
-                className="pointer-events-none absolute right-12 bottom-16 z-30"
-              >
-                <motion.svg
-                  width="120"
-                  height="120"
-                  viewBox="0 0 180 180"
-                  className="drop-shadow-[0_0_20px_rgba(220,38,38,0.6)]"
-                  style={{ rotate: -15 }}
-                >
-                  <path
-                    d="M90 150c-3.5 0-6.5-2-8-5-15-30-45-50-45-75 0-20 15-35 35-35 10 0 18 4 23 10 5-6 13-10 23-10 20 0 35 15 35 35 0 25-30 45-45 75-1.5 3-4.5 5-8 5z"
-                    fill="#dc2626"
-                    opacity="0.9"
-                  />
-                  <ellipse
-                    cx="90"
-                    cy="90"
-                    rx="85"
-                    ry="88"
-                    fill="none"
-                    stroke="#dc2626"
-                    strokeWidth="8"
-                    opacity="0.7"
-                  />
-                </motion.svg>
-              </motion.div>
-            </>
-          )}
-
           <motion.div
             animate={{
               rotateY: isFlipped ? 180 : 0,
             }}
             transition={{
               duration: 0.6,
-              ease: [0.785, 0.135, 0.15, 0.86],
+              ease: [0.455, 0.03, 0.515, 0.955],
             }}
             style={{
               transformStyle: 'preserve-3d',
@@ -236,7 +261,6 @@ export default function SwipeCard({
               height: '100%',
             }}
           >
-            {/* Front outer face */}
             <div
               style={{
                 backfaceVisibility: 'hidden',
@@ -248,7 +272,6 @@ export default function SwipeCard({
               <ProfileCardFront user={user} />
             </div>
 
-            {/* Back outer face - rotated 180deg to face opposite direction */}
             <div
               style={{
                 backfaceVisibility: 'hidden',

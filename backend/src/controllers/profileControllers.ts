@@ -65,7 +65,7 @@ export const updateMyProfile = async (req: Request, res: Response) => {
     if (!userId) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
-    const { name, bio, age, birthday, showBirthday, photoUrl, photos, province, city } = req.body;
+    const { name, bio, age, birthday, showBirthday, photoUrl, photos, province, city, gender, lookingForGenders } = req.body;
 
     const updateData: any = { updatedAt: new Date() };
 
@@ -78,6 +78,8 @@ export const updateMyProfile = async (req: Request, res: Response) => {
     if (photos !== undefined) updateData.photos = photos;
     if (province !== undefined) updateData.province = province;
     if (city !== undefined) updateData.city = city;
+    if (gender !== undefined) updateData.gender = gender;
+    if (lookingForGenders !== undefined) updateData.lookingForGenders = lookingForGenders;
 
     const updatedUser = await prisma.user.update({
       where: { id: userId },

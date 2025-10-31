@@ -1,14 +1,40 @@
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
+import { useState, useEffect } from 'react';
 import { api } from '../lib/api';
+import Spinner from '../components/Spinner';
 
 export default function Settings() {
   const navigate = useNavigate();
+  const [email, setEmail] = useState<string>('');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const data = await api.profile.getMe();
+        setEmail(data.user.email);
+      } catch (err) {
+        console.error('Failed to fetch profile:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProfile();
+  }, []);
 
   const handleLogout = () => {
     api.auth.logout();
     navigate('/');
   };
+
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Spinner color="#ec4899" size={48} />
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen items-start overflow-y-auto py-8 pl-28">
@@ -18,6 +44,12 @@ export default function Settings() {
             Settings
           </h1>
           <p className="mt-2 text-gray-600">Manage your account</p>
+          {email && (
+            <p className="mt-3 text-sm text-gray-500">
+              Logged in as{' '}
+              <span className="font-medium text-gray-700">{email}</span>
+            </p>
+          )}
         </div>
 
         <div className="space-y-6">
@@ -44,7 +76,8 @@ export default function Settings() {
             <div className="space-y-2 px-6 py-4 text-sm text-gray-600">
               <p>Version 0.0.1</p>
               <p>
-                Made by <span className="">Xein Virgines</span>
+                Made by Xein Virgines for{' '}
+                <span className="">White Cloak Technologies</span>
               </p>
             </div>
           </div>
