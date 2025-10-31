@@ -2,6 +2,7 @@ import { motion } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../lib/api';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
+import { toast } from 'sonner';
 
 interface MatchModalProps {
   userName: string;
@@ -49,12 +50,14 @@ export default function MatchModal({
               .map((id) => api.matches.markAsViewed(id))
           );
         }
+        toast.success(`You have ${totalMatches || 1} new ${totalMatches === 1 ? 'match' : 'matches'}! 💕`);
       } catch (error) {
         console.error('Failed to mark matches as viewed:', error);
       }
       navigate('/matches');
     } else {
       await api.matches.markAsViewed(matchId);
+      toast.success(`It's a match with ${userName}! 🎉`);
       navigate(`/profile/${userId}`);
     }
   };

@@ -4,7 +4,7 @@ import {
   useTransform,
   type PanInfo,
 } from 'motion/react';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { ProfileCardFront, ProfileCardBack } from '../ProfileCard';
 import { type User } from '../../lib/api';
 
@@ -29,6 +29,15 @@ export default function SwipeCard({
   const [isFlipping, setIsFlipping] = useState(false);
   const isDraggingRef = useRef(false);
   const dragStartY = useRef(0);
+
+  useEffect(() => {
+    if (exitDirection && onExitComplete) {
+      const timeout = setTimeout(() => {
+        onExitComplete();
+      }, 300);
+      return () => clearTimeout(timeout);
+    }
+  }, [exitDirection, onExitComplete]);
 
   const x = useMotionValue(0);
   const y = useMotionValue(0);

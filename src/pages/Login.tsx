@@ -39,11 +39,11 @@ export default function Login() {
 
   return (
     <div className="flex min-h-screen items-center justify-center">
-      <Card className="w-full max-w-md rounded-3xl border-0 bg-white/80 dark:bg-gray-800/80 p-10 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] ring-1 ring-zinc-950/10 dark:ring-white/10 backdrop-blur-xl">
+      <Card className="w-full max-w-md rounded-3xl border-0 bg-white/80 p-10 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] ring-1 ring-zinc-950/10 backdrop-blur-xl dark:bg-gray-800/80 dark:ring-white/10">
         <CardHeader className="space-y-3 text-center">
           <Link to="/" className="block">
             <h1
-              className="cursor-pointer pb-1 text-5xl leading-tight font-bold text-gray-900 dark:text-gray-100 transition-colors duration-200 hover:text-pink-600"
+              className="cursor-pointer pb-1 text-5xl leading-tight font-bold text-gray-900 transition-colors duration-200 hover:text-pink-600 dark:text-gray-100"
               style={{
                 fontFamily: "'Noto Serif', Georgia, 'Times New Roman', serif",
               }}
@@ -77,7 +77,10 @@ export default function Login() {
               />
 
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                <Label
+                  htmlFor="password"
+                  className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
                   Password
                 </Label>
                 <div className="relative">
@@ -93,7 +96,7 @@ export default function Login() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors duration-200"
+                    className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-500 transition-colors duration-200 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                     tabIndex={-1}
                   >
                     {showPassword ? (
@@ -127,7 +130,7 @@ export default function Login() {
               Don't have an account?{' '}
               <Link
                 to="/signup"
-                className="font-medium text-pink-600 dark:text-pink-400 transition-colors duration-200 hover:text-pink-700 dark:hover:text-pink-300 hover:underline"
+                className="font-medium text-pink-600 transition-colors duration-200 hover:text-pink-700 hover:underline dark:text-pink-400 dark:hover:text-pink-300"
               >
                 Sign up
               </Link>
@@ -144,7 +147,6 @@ export default function Login() {
                 { name: 'Ben', email: 'ben@forkeep.app' },
                 { name: 'Ava', email: 'ava@forkeep.app' },
                 { name: 'Chloe', email: 'chloe@forkeep.app' },
-                { name: 'David', email: 'david@forkeep.app' },
               ].map((account) => (
                 <button
                   key={account.email}
@@ -153,7 +155,7 @@ export default function Login() {
                     setEmail(account.email);
                     setPassword('password123');
                   }}
-                  className="rounded-lg bg-gray-100 dark:bg-gray-700/60 px-3 py-2 text-xs font-medium text-gray-700 dark:text-gray-300 transition-colors duration-200 hover:bg-gray-200 dark:hover:bg-gray-600"
+                  className="rounded-lg bg-gray-100 px-3 py-2 text-xs font-medium text-gray-700 transition-colors duration-200 hover:bg-gray-200 dark:bg-gray-700/60 dark:text-gray-300 dark:hover:bg-gray-600"
                 >
                   {account.name}
                 </button>

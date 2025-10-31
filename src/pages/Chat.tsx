@@ -4,6 +4,7 @@ import { api, type Message, type Match } from '../lib/api';
 import { getCurrentUserId } from '../utils/auth';
 import LoadingState from '../components/common/LoadingState';
 import FormInput from '@/components/FormInput';
+import { toast } from 'sonner';
 
 export default function Chat() {
   const { matchId } = useParams<{ matchId: string }>();
@@ -67,8 +68,10 @@ export default function Chat() {
       await api.messages.send(matchId, newMessage.trim());
       setNewMessage('');
       await fetchMessages();
+      toast.success('Message sent! 💌');
     } catch (error) {
       console.error('Failed to send message:', error);
+      toast.error('Failed to send message. Please try again.');
     } finally {
       setSending(false);
     }

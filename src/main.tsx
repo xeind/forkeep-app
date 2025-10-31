@@ -19,6 +19,7 @@ import Settings from './pages/Settings.tsx';
 import AppLayout from './components/AppLayout.tsx';
 import Navbar from './components/Navbar.tsx';
 import { ThemeProvider } from './contexts/ThemeContext.tsx';
+import { Toaster } from '@/components/ui/sonner.tsx';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const token = localStorage.getItem('forkeep_token');
@@ -125,6 +126,7 @@ createRoot(document.getElementById('root')!).render(
     <BrowserRouter>
       <ThemeProvider>
         <AppRoutes />
+        <Toaster />
       </ThemeProvider>
     </BrowserRouter>
   </StrictMode>
