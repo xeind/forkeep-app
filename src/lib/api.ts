@@ -124,7 +124,11 @@ export const api = {
   users: {
     discover: async (
       cursor?: string,
-      limit = 10
+      limit = 10,
+      minAge?: number,
+      maxAge?: number,
+      province?: string,
+      city?: string
     ): Promise<{
       users: User[];
       nextCursor: string | null;
@@ -133,6 +137,10 @@ export const api = {
       const params = new URLSearchParams();
       if (cursor) params.append('cursor', cursor);
       params.append('limit', limit.toString());
+      if (minAge !== undefined) params.append('minAge', minAge.toString());
+      if (maxAge !== undefined) params.append('maxAge', maxAge.toString());
+      if (province) params.append('province', province);
+      if (city) params.append('city', city);
 
       const queryString = params.toString();
       return authFetch(

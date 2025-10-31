@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { AnimatePresence } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
 import SwipeCard from '../components/matching/SwipeCard';
 import MatchModal from '../components/MatchModal';
 import EmptyState from '../components/common/EmptyState';
 import { api, type User, type Match } from '../lib/api';
+import { getAllProvinces, getCitiesByProvince } from '../data/philippinesLocations';
 
 // Cache users across component remounts
 let cachedUsers: User[] = [];
@@ -26,6 +27,13 @@ export default function Discover() {
   const [swiping, setSwiping] = useState(false);
   const [unviewedMatches, setUnviewedMatches] = useState<Match[]>([]);
   const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
+  const [showFilters, setShowFilters] = useState(false);
+  const [minAge, setMinAge] = useState(18);
+  const [maxAge, setMaxAge] = useState(99);
+  const [selectedProvince, setSelectedProvince] = useState<string>('');
+  const [selectedCity, setSelectedCity] = useState<string>('');
+  const [provinces] = useState(getAllProvinces());
+  const [cities, setCities] = useState<string[]>([]);
 
   const BATCH_SIZE = 10;
   const FETCH_THRESHOLD = 3;
@@ -122,7 +130,7 @@ export default function Discover() {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const data = await api.users.discover(undefined, BATCH_SIZE);
+      const data = await api.users.discover(undefined, BATCH_SIZE, minAge, maxAge, selectedProvince, selectedCity);
       cachedUsers = data.users;
       setUsers(data.users);
       setNextCursor(data.nextCursor);
@@ -139,7 +147,7 @@ export default function Discover() {
 
     try {
       setFetchingMore(true);
-      const data = await api.users.discover(nextCursor, BATCH_SIZE);
+      const data = await api.users.discover(nextCursor, BATCH_SIZE, minAge, maxAge, selectedProvince, selectedCity);
       const updatedUsers = [...users, ...data.users];
       cachedUsers = updatedUsers;
       setUsers(updatedUsers);
@@ -150,6 +158,18 @@ export default function Discover() {
     } finally {
       setFetchingMore(false);
     }
+  };
+
+  const applyFilters = () => {
+    setCurrentIndex(0);
+    setUsers([]);
+    cachedUsers = [];
+    setNextCursor(null);
+    setHasMore(true);
+    setImagesLoaded(false);
+    setInitialLoad(true);
+    setShowFilters(false);
+    fetchUsers();
   };
 
   const handleSwipe = async (direction: 'left' | 'right') => {
@@ -223,6 +243,42 @@ export default function Discover() {
   // Next card (background) is always currentIndex + 1
   const nextUser = currentIndex + 1 < users.length ? users[currentIndex + 1] : null;
 
+  const handleProvinceChange = (province: string) => {
+    setSelectedProvince(province);
+    setSelectedCity('');
+    if (province) {
+      setCities(getCitiesByProvince(province));
+    } else {
+      setCities([]);
+    }
+  };
+
+  const hasActiveFilters = minAge !== 18 || maxAge !== 99 || selectedProvince || selectedCity;
+
+  const getFilterSummary = () => {
+    const filters: Array<{ label: string; type: 'age' | 'location' }> = [];
+    if (minAge !== 18 || maxAge !== 99) {
+      filters.push({ label: `${minAge}-${maxAge} yrs`, type: 'age' });
+    }
+    if (selectedCity && selectedProvince) {
+      filters.push({ label: `${selectedCity}, ${selectedProvince}`, type: 'location' });
+    } else if (selectedProvince) {
+      filters.push({ label: selectedProvince, type: 'location' });
+    }
+    return filters;
+  };
+
+  const clearAgeFilter = () => {
+    setMinAge(18);
+    setMaxAge(99);
+  };
+
+  const clearLocationFilter = () => {
+    setSelectedProvince('');
+    setSelectedCity('');
+    setCities([]);
+  };
+
   return (
     <>
       <div className="flex h-screen items-center justify-center">
@@ -267,6 +323,226 @@ export default function Discover() {
           </div>
         ) : null}
       </div>
+
+      <div className="fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2">
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setShowFilters(!showFilters)}
+          className={`flex items-center gap-2 rounded-full px-6 py-3 font-medium shadow-[0px_0px_1px_1px_rgba(255,255,255,0.08)_inset,0px_1px_1.5px_0px_rgba(0,0,0,0.32),0px_0px_0px_0.5px_rgba(0,0,0,0.1)] backdrop-blur-xl transition-all ${
+            hasActiveFilters
+              ? 'bg-pink-500/90 text-white dark:bg-pink-600/90'
+              : 'bg-white/90 text-gray-700 dark:bg-gray-800/90 dark:text-gray-200'
+          } dark:shadow-[0px_0px_1px_1px_rgba(255,255,255,0.05)_inset,0px_1px_1.5px_0px_rgba(0,0,0,0.5),0px_0px_0px_0.5px_rgba(255,255,255,0.1)]`}
+        >
+          <svg
+            className="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75"
+            />
+          </svg>
+          Filters
+          {hasActiveFilters && (
+            <span className="flex h-2 w-2 items-center justify-center rounded-full bg-white dark:bg-pink-200" />
+          )}
+        </motion.button>
+
+        {hasActiveFilters && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            className="flex items-center gap-2"
+          >
+            {getFilterSummary().map((filter, index) => (
+              <motion.button
+                key={index}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.05 }}
+                onClick={() => {
+                  if (filter.type === 'age') {
+                    clearAgeFilter();
+                  } else {
+                    clearLocationFilter();
+                  }
+                  applyFilters();
+                }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="flex items-center gap-1.5 rounded-full bg-pink-500/90 px-3 py-2 text-xs font-medium text-white shadow-md backdrop-blur-xl transition-colors hover:bg-pink-600/90 dark:bg-pink-600/90 dark:hover:bg-pink-700/90"
+              >
+                {filter.label}
+                <svg
+                  className="h-3.5 w-3.5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2.5}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </motion.button>
+            ))}
+          </motion.div>
+        )}
+      </div>
+
+      <AnimatePresence>
+        {showFilters && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            transition={{ duration: 0.2, ease: [0.215, 0.61, 0.355, 1] }}
+            className="fixed bottom-24 left-1/2 z-40 w-[440px] -translate-x-1/2 rounded-3xl bg-white/95 p-6 shadow-[0px_0px_1px_1px_rgba(255,255,255,0.08)_inset,0px_1px_1.5px_0px_rgba(0,0,0,0.32),0px_0px_0px_0.5px_rgba(0,0,0,0.1)] backdrop-blur-xl dark:bg-gray-800/95 dark:shadow-[0px_0px_1px_1px_rgba(255,255,255,0.05)_inset,0px_1px_1.5px_0px_rgba(0,0,0,0.5),0px_0px_0px_0.5px_rgba(255,255,255,0.1)]"
+          >
+            <h3 className="mb-5 text-xl font-semibold text-gray-900 dark:text-gray-100">
+              Discovery Filters
+            </h3>
+
+            <div className="space-y-5">
+              <div>
+                <h4 className="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-300">
+                  Age Range
+                </h4>
+                <div className="space-y-3">
+                  <div>
+                    <label className="mb-2 block text-sm font-medium text-gray-600 dark:text-gray-400">
+                      Min Age: {minAge}
+                    </label>
+                    <input
+                      type="range"
+                      min="18"
+                      max="99"
+                      value={minAge}
+                      onChange={(e) => {
+                        const value = Number(e.target.value);
+                        if (value <= maxAge) {
+                          setMinAge(value);
+                        }
+                      }}
+                      className="h-2 w-full cursor-pointer appearance-none rounded-lg"
+                      style={{
+                        background: `linear-gradient(to right, #ec4899 0%, #ec4899 ${((minAge - 18) / (99 - 18)) * 100}%, #e5e7eb ${((minAge - 18) / (99 - 18)) * 100}%, #e5e7eb 100%)`,
+                      }}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="mb-2 block text-sm font-medium text-gray-600 dark:text-gray-400">
+                      Max Age: {maxAge}
+                    </label>
+                    <input
+                      type="range"
+                      min="18"
+                      max="99"
+                      value={maxAge}
+                      onChange={(e) => {
+                        const value = Number(e.target.value);
+                        if (value >= minAge) {
+                          setMaxAge(value);
+                        }
+                      }}
+                      className="h-2 w-full cursor-pointer appearance-none rounded-lg"
+                      style={{
+                        background: `linear-gradient(to right, #ec4899 0%, #ec4899 ${((maxAge - 18) / (99 - 18)) * 100}%, #e5e7eb ${((maxAge - 18) / (99 - 18)) * 100}%, #e5e7eb 100%)`,
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent dark:via-gray-700" />
+
+              <div>
+                <h4 className="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-300">
+                  Preferred Location
+                </h4>
+                <div className="space-y-3">
+                  <div>
+                    <label className="mb-2 block text-sm font-medium text-gray-600 dark:text-gray-400">
+                      Province
+                    </label>
+                    <select
+                      value={selectedProvince}
+                      onChange={(e) => handleProvinceChange(e.target.value)}
+                      className="w-full rounded-xl border-0 bg-gray-50 px-4 py-2.5 text-sm text-gray-900 ring-1 ring-inset ring-gray-200 transition-all focus:ring-2 focus:ring-pink-500 dark:bg-gray-700/60 dark:text-gray-100 dark:ring-white/10 dark:focus:ring-pink-900/50"
+                    >
+                      <option value="">All Provinces</option>
+                      {provinces.map((province) => (
+                        <option key={province} value={province}>
+                          {province}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {selectedProvince && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                    >
+                      <label className="mb-2 block text-sm font-medium text-gray-600 dark:text-gray-400">
+                        City
+                      </label>
+                      <select
+                        value={selectedCity}
+                        onChange={(e) => setSelectedCity(e.target.value)}
+                        className="w-full rounded-xl border-0 bg-gray-50 px-4 py-2.5 text-sm text-gray-900 ring-1 ring-inset ring-gray-200 transition-all focus:ring-2 focus:ring-pink-500 dark:bg-gray-700/60 dark:text-gray-100 dark:ring-white/10 dark:focus:ring-pink-900/50"
+                      >
+                        <option value="">All Cities</option>
+                        {cities.map((city) => (
+                          <option key={city} value={city}>
+                            {city}
+                          </option>
+                        ))}
+                      </select>
+                    </motion.div>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => {
+                    setMinAge(18);
+                    setMaxAge(99);
+                    setSelectedProvince('');
+                    setSelectedCity('');
+                    setCities([]);
+                  }}
+                  className="flex-1 rounded-full border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition-all duration-200 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                >
+                  Clear All
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={applyFilters}
+                  className="flex-1 rounded-full bg-linear-to-b from-pink-500 to-pink-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md transition-all duration-200"
+                >
+                  Apply Filters
+                </motion.button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {unviewedMatches.length > 0 && unviewedMatches[currentMatchIndex] && (
         <MatchModal

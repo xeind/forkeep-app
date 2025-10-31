@@ -46,13 +46,13 @@ export function ProfileCardFront({ user }: { user: User }) {
             </span>
             <div
               className={`inline-flex items-center gap-1 rounded-full px-2 py-1 ${
-                user.gender === 'Male'
-                  ? 'bg-blue-100 text-blue-700'
-                  : user.gender === 'Female'
-                    ? 'bg-pink-100 text-pink-700'
+                user.gender === 'Men'
+                  ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
+                  : user.gender === 'Women'
+                    ? 'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-300'
                     : user.gender === 'Non-binary'
-                      ? 'bg-purple-100 text-purple-700'
-                      : 'bg-gray-200 text-gray-700'
+                      ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300'
+                      : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
               }`}
             >
               <UserIcon className="h-3 w-3" />
@@ -67,7 +67,7 @@ export function ProfileCardFront({ user }: { user: User }) {
               </div>
             )}
             {user.birthday && (
-              <div className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-1 text-amber-700">
+              <div className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-1 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
                 <Cake className="h-3 w-3" />
                 <span className="text-xs font-medium">
                   {new Date(user.birthday).toLocaleDateString('en-US', {

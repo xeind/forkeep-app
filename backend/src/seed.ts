@@ -1,8 +1,57 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import { randomUUID } from 'crypto';
+import phLocations from 'ph-locations';
 
 const prisma = new PrismaClient();
+
+interface PhProvince {
+  code: string;
+  name: string;
+  altName: string | null;
+  nameTL: string;
+  region: string;
+}
+
+interface PhCity {
+  name: string;
+  fullName: string;
+  altName: string | null;
+  province: string | null;
+  classification: string;
+  isCapital: boolean;
+}
+
+const provinces = phLocations.provinces as PhProvince[];
+const citiesMunicipalities = phLocations.citiesMunicipalities as PhCity[];
+
+function getAllProvinces(): string[] {
+  const regularProvinces = provinces.map((p) => p.name);
+  const ncrCities = citiesMunicipalities.filter((c) => c.province === null);
+
+  if (ncrCities.length > 0) {
+    return ['Metro Manila', ...regularProvinces];
+  }
+
+  return regularProvinces;
+}
+
+function getCitiesByProvince(provinceName: string): string[] {
+  if (provinceName === 'Metro Manila') {
+    return citiesMunicipalities
+      .filter((c) => c.province === null)
+      .map((c) => c.name);
+  }
+
+  const province = provinces.find((p) => p.name === provinceName);
+  if (!province) {
+    return [];
+  }
+
+  return citiesMunicipalities
+    .filter((c) => c.province === province.code)
+    .map((c) => c.name);
+}
 
 const maleNames = [
   'Alex', 'Ben', 'Chris', 'Daniel', 'Ethan',
@@ -49,18 +98,27 @@ const bioTemplates = [
   'DIY home renovator 🔨 | HGTV is my guilty pleasure'
 ];
 
-const locations = [
-  'New York, NY',
-  'Los Angeles, CA',
-  'Chicago, IL',
-  'Austin, TX',
-  'Seattle, WA',
-  'Denver, CO',
-  'Portland, OR',
-  'San Francisco, CA',
-  'Miami, FL',
-  'Boston, MA'
+const popularProvinces = [
+  'Metro Manila',
+  'Cebu',
+  'Davao del Sur',
+  'Rizal',
+  'Cavite',
+  'Laguna',
+  'Bulacan',
+  'Pampanga',
+  'Benguet',
+  'Iloilo',
+  'Negros Occidental',
+  'Palawan'
 ];
+
+function getRandomLocation(): { province: string; city: string } {
+  const province = randomItem(popularProvinces);
+  const cities = getCitiesByProvince(province);
+  const city = cities.length > 0 ? randomItem(cities) : province;
+  return { province, city };
+}
 
 function randomItem<T>(array: T[]): T {
   return array[Math.floor(Math.random() * array.length)];
@@ -74,8 +132,7 @@ async function createUser(name: string, gender: string) {
   const lookingForGenders = gender === 'Men' ? ['Women'] : ['Men'];
   const age = randomAge();
   const bio = randomItem(bioTemplates);
-  const location = randomItem(locations);
-  const [city, province] = location.split(', ');
+  const { province, city } = getRandomLocation();
   const photoUrl = `https://i.pravatar.cc/300?u=${name.toLowerCase()}`;
   const photos = [
     photoUrl,

@@ -12,6 +12,10 @@ export const getDiscoverUsers = async (req: Request, res: Response) => {
 
     const cursor = req.query.cursor as string | undefined;
     const limit = parseInt(req.query.limit as string) || 10;
+    const minAge = req.query.minAge ? parseInt(req.query.minAge as string) : undefined;
+    const maxAge = req.query.maxAge ? parseInt(req.query.maxAge as string) : undefined;
+    const province = req.query.province as string | undefined;
+    const city = req.query.city as string | undefined;
 
     const currentUser = await prisma.user.findUnique({
       where: { id: userId },
@@ -88,6 +92,27 @@ export const getDiscoverUsers = async (req: Request, res: Response) => {
     const genderFilter = normalizeGenderForMatching(currentUser.lookingForGenders);
     const lookingForFilter = buildLookingForFilter(currentUser.gender);
 
+    // Build age filter
+    const ageFilter: any = {};
+    if (minAge !== undefined || maxAge !== undefined) {
+      if (minAge !== undefined && maxAge !== undefined) {
+        ageFilter.age = { gte: minAge, lte: maxAge };
+      } else if (minAge !== undefined) {
+        ageFilter.age = { gte: minAge };
+      } else if (maxAge !== undefined) {
+        ageFilter.age = { lte: maxAge };
+      }
+    }
+
+    // Build location filter
+    const locationFilter: any = {};
+    if (province) {
+      locationFilter.province = province;
+    }
+    if (city) {
+      locationFilter.city = city;
+    }
+
     const allUsers = await prisma.user.findMany({
       where: {
         AND: [
@@ -99,6 +124,8 @@ export const getDiscoverUsers = async (req: Request, res: Response) => {
           },
           genderFilter,
           lookingForFilter,
+          ageFilter,
+          locationFilter,
         ],
       },
     });
