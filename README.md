@@ -23,10 +23,8 @@ Forkeep reimagines online dating by combating swipe fatigue and superficial conn
 - **Photocard Interface**: Cards occupy 70% of the viewport with large portrait photos
 - **Flip Interaction**: Click to reveal the back of the card with detailed prompts
 - **Swipe Animations**: Heart stamp on right swipe, fold animation on left swipe
-- **Light/Dark Themes**:
-  - Light mode: Scrapbook desk aesthetic with craft paper texture
-  - Dark mode: Film lab/darkroom with charcoal grain and subtle vignette
 - **Typography**: Noto Serif for elegant, intentional presentation
+- **Light/Dark Themes**
 
 ### Bonus Features
 
