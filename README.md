@@ -156,6 +156,7 @@ The app is configured for deployment on:
 
 - **Frontend**: Vercel
 - **Backend**: Railway
+- **Database**: Neon
 
 ## Demo Accounts
 
