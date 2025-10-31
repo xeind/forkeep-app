@@ -4,7 +4,10 @@ import SwipeCard from '../components/matching/SwipeCard';
 import MatchModal from '../components/MatchModal';
 import EmptyState from '../components/common/EmptyState';
 import { api, type User, type Match } from '../lib/api';
-import { getAllProvinces, getCitiesByProvince } from '../data/philippinesLocations';
+import {
+  getAllProvinces,
+  getCitiesByProvince,
+} from '../data/philippinesLocations';
 
 // Cache users across component remounts
 let cachedUsers: User[] = [];
@@ -130,7 +133,14 @@ export default function Discover() {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const data = await api.users.discover(undefined, BATCH_SIZE, minAge, maxAge, selectedProvince, selectedCity);
+      const data = await api.users.discover(
+        undefined,
+        BATCH_SIZE,
+        minAge,
+        maxAge,
+        selectedProvince,
+        selectedCity
+      );
       cachedUsers = data.users;
       setUsers(data.users);
       setNextCursor(data.nextCursor);
@@ -147,7 +157,14 @@ export default function Discover() {
 
     try {
       setFetchingMore(true);
-      const data = await api.users.discover(nextCursor, BATCH_SIZE, minAge, maxAge, selectedProvince, selectedCity);
+      const data = await api.users.discover(
+        nextCursor,
+        BATCH_SIZE,
+        minAge,
+        maxAge,
+        selectedProvince,
+        selectedCity
+      );
       const updatedUsers = [...users, ...data.users];
       cachedUsers = updatedUsers;
       setUsers(updatedUsers);
@@ -239,9 +256,10 @@ export default function Discover() {
 
   // Current card is always at currentIndex (exitingCard just controls animation)
   const currentUser = currentIndex < users.length ? users[currentIndex] : null;
-  
+
   // Next card (background) is always currentIndex + 1
-  const nextUser = currentIndex + 1 < users.length ? users[currentIndex + 1] : null;
+  const nextUser =
+    currentIndex + 1 < users.length ? users[currentIndex + 1] : null;
 
   const handleProvinceChange = (province: string) => {
     setSelectedProvince(province);
@@ -253,7 +271,8 @@ export default function Discover() {
     }
   };
 
-  const hasActiveFilters = minAge !== 18 || maxAge !== 99 || selectedProvince || selectedCity;
+  const hasActiveFilters =
+    minAge !== 18 || maxAge !== 99 || selectedProvince || selectedCity;
 
   const getFilterSummary = () => {
     const filters: Array<{ label: string; type: 'age' | 'location' }> = [];
@@ -261,7 +280,10 @@ export default function Discover() {
       filters.push({ label: `${minAge}-${maxAge} yrs`, type: 'age' });
     }
     if (selectedCity && selectedProvince) {
-      filters.push({ label: `${selectedCity}, ${selectedProvince}`, type: 'location' });
+      filters.push({
+        label: `${selectedCity}, ${selectedProvince}`,
+        type: 'location',
+      });
     } else if (selectedProvince) {
       filters.push({ label: selectedProvince, type: 'location' });
     }
@@ -478,7 +500,7 @@ export default function Discover() {
                     <select
                       value={selectedProvince}
                       onChange={(e) => handleProvinceChange(e.target.value)}
-                      className="w-full rounded-xl border-0 bg-gray-50 px-4 py-2.5 text-sm text-gray-900 ring-1 ring-inset ring-gray-200 transition-all focus:ring-2 focus:ring-pink-500 dark:bg-gray-700/60 dark:text-gray-100 dark:ring-white/10 dark:focus:ring-pink-900/50"
+                      className="w-full rounded-xl border-0 bg-gray-50 px-4 py-2.5 text-sm text-gray-900 ring-1 ring-gray-200 transition-all ring-inset focus:ring-2 focus:ring-pink-500 dark:bg-gray-700/60 dark:text-gray-100 dark:ring-white/10 dark:focus:ring-pink-900/50"
                     >
                       <option value="">All Provinces</option>
                       {provinces.map((province) => (
@@ -501,7 +523,7 @@ export default function Discover() {
                       <select
                         value={selectedCity}
                         onChange={(e) => setSelectedCity(e.target.value)}
-                        className="w-full rounded-xl border-0 bg-gray-50 px-4 py-2.5 text-sm text-gray-900 ring-1 ring-inset ring-gray-200 transition-all focus:ring-2 focus:ring-pink-500 dark:bg-gray-700/60 dark:text-gray-100 dark:ring-white/10 dark:focus:ring-pink-900/50"
+                        className="w-full rounded-xl border-0 bg-gray-50 px-4 py-2.5 text-sm text-gray-900 ring-1 ring-gray-200 transition-all ring-inset focus:ring-2 focus:ring-pink-500 dark:bg-gray-700/60 dark:text-gray-100 dark:ring-white/10 dark:focus:ring-pink-900/50"
                       >
                         <option value="">All Cities</option>
                         {cities.map((city) => (
@@ -525,6 +547,7 @@ export default function Discover() {
                     setSelectedProvince('');
                     setSelectedCity('');
                     setCities([]);
+                    applyFilters();
                   }}
                   className="flex-1 rounded-full border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition-all duration-200 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
                 >
