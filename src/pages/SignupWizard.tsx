@@ -235,12 +235,12 @@ export default function SignupWizard() {
   return (
     <div className="flex min-h-screen items-center justify-center py-12">
       <div className="w-full max-w-md backdrop-blur-xl">
-        <Card className="space-y-8 rounded-3xl bg-white/80 p-10 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] ring-1 ring-zinc-950/10">
+        <Card className="space-y-8 rounded-3xl bg-white/80 dark:bg-gray-800/80 p-10 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] ring-1 ring-zinc-950/10 dark:ring-white/10">
           <CardHeader className="p-0">
             <div className="text-center">
               <Link to="/" className="block">
                 <h1
-                  className="cursor-pointer pb-1 text-5xl leading-tight font-bold text-gray-900 transition-colors duration-200 hover:text-pink-600"
+                  className="cursor-pointer pb-1 text-5xl leading-tight font-bold text-gray-900 dark:text-gray-100 transition-colors duration-200 hover:text-pink-600 dark:hover:text-pink-400"
                   style={{
                     fontFamily:
                       "'Noto Serif', Georgia, 'Times New Roman', serif",
@@ -249,7 +249,7 @@ export default function SignupWizard() {
                   Join Forkeep
                 </h1>
               </Link>
-              <p className="mt-3 text-sm text-gray-600">
+              <p className="mt-3 text-sm text-gray-600 dark:text-gray-300">
                 Step {currentStep} of {TOTAL_STEPS}
               </p>
               <Progress
@@ -362,11 +362,11 @@ export default function SignupWizard() {
               )}
             </div>
 
-            <p className="text-center text-sm text-gray-600">
+            <p className="text-center text-sm text-gray-600 dark:text-gray-300">
               Already have an account?{' '}
               <Link
                 to="/"
-                className="font-medium text-pink-600 transition-colors duration-200 hover:text-pink-700 hover:underline"
+                className="font-medium text-pink-600 dark:text-pink-400 transition-colors duration-200 hover:text-pink-700 dark:hover:text-pink-300 hover:underline"
               >
                 Sign in
               </Link>
@@ -438,7 +438,7 @@ function StepOne({ formData, updateFormData, updateBirthday }: StepProps) {
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="mb-6 text-center text-2xl font-semibold text-gray-800">
+        <h2 className="mb-6 text-center text-2xl font-semibold text-gray-800 dark:text-gray-100">
           Let's start with the basics
         </h2>
       </div>
@@ -455,7 +455,7 @@ function StepOne({ formData, updateFormData, updateBirthday }: StepProps) {
             onChange={(e) => updateFormData('name', e.target.value)}
             placeholder="Your name"
           />
-          <p className="text-right text-xs text-gray-500">
+          <p className="text-right text-xs text-gray-500 dark:text-gray-400">
             {formData.name.length}/16 characters
           </p>
         </div>
@@ -463,7 +463,7 @@ function StepOne({ formData, updateFormData, updateBirthday }: StepProps) {
         <div>
           <label
             htmlFor="birthday"
-            className="mb-2 block text-sm font-medium text-gray-700"
+            className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
           >
             Birthday <span className="text-red-500">*</span>
           </label>
@@ -503,7 +503,7 @@ function StepOne({ formData, updateFormData, updateBirthday }: StepProps) {
             </PopoverContent>
           </Popover>
           {formData.birthday && (
-            <p className="mt-1 text-sm text-gray-600">
+            <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">
               Age: {calculateAge(formData.birthday)} years old
             </p>
           )}
@@ -584,7 +584,7 @@ function StepTwo({ formData, updateFormData, setFormData }: StepProps) {
 
   const getColorClasses = (value: string, isSelected: boolean) => {
     if (!isSelected) {
-      return 'bg-white/60 text-gray-700 ring-1 ring-zinc-950/10 hover:bg-white hover:ring-pink-500/30';
+      return 'bg-white/60 dark:bg-gray-700/60 text-gray-700 dark:text-gray-200 ring-1 ring-zinc-950/10 dark:ring-white/10 hover:bg-white dark:hover:bg-gray-700 hover:ring-pink-500/30';
     }
 
     const colorMap: Record<string, string> = {
@@ -680,14 +680,14 @@ function StepTwo({ formData, updateFormData, setFormData }: StepProps) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="mb-6 text-center text-2xl font-semibold text-gray-800">
+        <h2 className="mb-6 text-center text-2xl font-semibold text-gray-800 dark:text-gray-100">
           Tell us about yourself
         </h2>
       </div>
 
       <div>
         <div
-          className="mb-3 text-sm font-medium text-gray-700"
+          className="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300"
           role="group"
           aria-label="Gender identity"
         >
@@ -716,10 +716,10 @@ function StepTwo({ formData, updateFormData, setFormData }: StepProps) {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.15 }}
-                  className="pointer-events-none absolute -top-10 left-1/2 z-10 -translate-x-1/2 rounded-md bg-gray-900 px-2 py-1 text-xs whitespace-nowrap text-white shadow-lg"
+                  className="pointer-events-none absolute -top-10 left-1/2 z-10 -translate-x-1/2 rounded-md bg-gray-900 dark:bg-gray-700 px-2 py-1 text-xs whitespace-nowrap text-white shadow-lg"
                 >
                   {option.value}
-                  <div className="absolute -bottom-1 left-1/2 h-2 w-2 -translate-x-1/2 rotate-45 bg-gray-900" />
+                  <div className="absolute -bottom-1 left-1/2 h-2 w-2 -translate-x-1/2 rotate-45 bg-gray-900 dark:bg-gray-700" />
                 </motion.div>
               )}
             </div>
@@ -729,7 +729,7 @@ function StepTwo({ formData, updateFormData, setFormData }: StepProps) {
 
       <div>
         <div
-          className="mb-3 text-sm font-medium text-gray-700"
+          className="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300"
           role="group"
           aria-label="Preference"
         >
@@ -760,10 +760,10 @@ function StepTwo({ formData, updateFormData, setFormData }: StepProps) {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.15 }}
-                  className="pointer-events-none absolute -top-10 left-1/2 z-10 -translate-x-1/2 rounded-md bg-gray-900 px-2 py-1 text-xs whitespace-nowrap text-white shadow-lg"
+                  className="pointer-events-none absolute -top-10 left-1/2 z-10 -translate-x-1/2 rounded-md bg-gray-900 dark:bg-gray-700 px-2 py-1 text-xs whitespace-nowrap text-white shadow-lg"
                 >
                   {option.value}
-                  <div className="absolute -bottom-1 left-1/2 h-2 w-2 -translate-x-1/2 rotate-45 bg-gray-900" />
+                  <div className="absolute -bottom-1 left-1/2 h-2 w-2 -translate-x-1/2 rotate-45 bg-gray-900 dark:bg-gray-700" />
                 </motion.div>
               )}
             </div>
@@ -778,7 +778,7 @@ function StepThree({ formData, updateFormData }: StepProps) {
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="mb-6 text-center text-2xl font-semibold text-gray-800">
+        <h2 className="mb-6 text-center text-2xl font-semibold text-gray-800 dark:text-gray-100">
           Share your story
         </h2>
       </div>
@@ -837,10 +837,10 @@ function StepFour({ formData, setFormData, setError }: PhotoStepProps) {
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="mb-6 text-center text-2xl font-semibold text-gray-800">
+        <h2 className="mb-6 text-center text-2xl font-semibold text-gray-800 dark:text-gray-100">
           Add your photo
         </h2>
-        <p className="text-center text-sm text-gray-600">
+        <p className="text-center text-sm text-gray-600 dark:text-gray-300">
           This will be your main profile photo
         </p>
       </div>
@@ -850,14 +850,14 @@ function StepFour({ formData, setFormData, setError }: PhotoStepProps) {
           <img
             src={formData.photoUrl}
             alt="Profile preview"
-            className="h-48 w-48 rounded-lg object-cover ring-1 ring-zinc-950/10"
+            className="h-48 w-48 rounded-lg object-cover ring-1 ring-zinc-950/10 dark:ring-white/10"
           />
         </div>
       )}
 
       <label
         htmlFor="photo-upload"
-        className="block w-full cursor-pointer rounded-lg border-2 border-dashed border-gray-300 bg-white/60 p-6 text-center transition-all duration-200 hover:border-pink-400 hover:bg-pink-50/50"
+        className="block w-full cursor-pointer rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 bg-white/60 dark:bg-gray-700/60 p-6 text-center transition-all duration-200 hover:border-pink-400 dark:hover:border-pink-500 hover:bg-pink-50/50 dark:hover:bg-gray-700"
       >
         <div className="space-y-2">
           <svg
@@ -873,19 +873,19 @@ function StepFour({ formData, setFormData, setError }: PhotoStepProps) {
               d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
             />
           </svg>
-          <div className="text-sm text-gray-600">
+          <div className="text-sm text-gray-600 dark:text-gray-300">
             {uploading ? (
-              <span className="font-medium text-pink-600">Uploading...</span>
+              <span className="font-medium text-pink-600 dark:text-pink-400">Uploading...</span>
             ) : (
               <>
-                <span className="font-medium text-pink-600">
+                <span className="font-medium text-pink-600 dark:text-pink-400">
                   Click to upload
                 </span>
                 {' or drag and drop'}
               </>
             )}
           </div>
-          <p className="text-xs text-gray-500">PNG, JPG, WebP up to 5MB</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">PNG, JPG, WebP up to 5MB</p>
         </div>
         <input
           id="photo-upload"
@@ -963,10 +963,10 @@ function StepFive({ formData, setFormData, setError }: PhotoStepProps) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="mb-2 text-center text-2xl font-semibold text-gray-800">
+        <h2 className="mb-2 text-center text-2xl font-semibold text-gray-800 dark:text-gray-100">
           Add more photos
         </h2>
-        <p className="text-center text-sm text-gray-600">
+        <p className="text-center text-sm text-gray-600 dark:text-gray-300">
           Upload 2-3 additional photos (optional)
         </p>
       </div>
@@ -1009,7 +1009,7 @@ function StepFive({ formData, setFormData, setError }: PhotoStepProps) {
       {formData.photos.length < 3 && (
         <label
           htmlFor="gallery-upload"
-          className="block w-full cursor-pointer rounded-lg border-2 border-dashed border-gray-300 bg-white/60 p-6 text-center transition-all duration-200 hover:border-pink-400 hover:bg-pink-50/50"
+          className="block w-full cursor-pointer rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 bg-white/60 dark:bg-gray-700/60 p-6 text-center transition-all duration-200 hover:border-pink-400 dark:hover:border-pink-500 hover:bg-pink-50/50 dark:hover:bg-gray-700"
         >
           <div className="space-y-2">
             <svg
@@ -1025,18 +1025,18 @@ function StepFive({ formData, setFormData, setError }: PhotoStepProps) {
                 d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
               />
             </svg>
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-gray-600 dark:text-gray-300">
               {uploading ? (
-                <span className="font-medium text-pink-600">Uploading...</span>
+                <span className="font-medium text-pink-600 dark:text-pink-400">Uploading...</span>
               ) : (
                 <>
-                  <span className="font-medium text-pink-600">Add photos</span>
+                  <span className="font-medium text-pink-600 dark:text-pink-400">Add photos</span>
                   {' ('}
                   {formData.photos.length}/3)
                 </>
               )}
             </div>
-            <p className="text-xs text-gray-500">Select up to 3 images</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Select up to 3 images</p>
           </div>
           <input
             id="gallery-upload"
@@ -1060,7 +1060,7 @@ function StepSix({ formData, updateFormData }: StepProps) {
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="mb-6 text-center text-2xl font-semibold text-gray-800">
+        <h2 className="mb-6 text-center text-2xl font-semibold text-gray-800 dark:text-gray-100">
           Secure your account
         </h2>
       </div>
@@ -1078,7 +1078,7 @@ function StepSix({ formData, updateFormData }: StepProps) {
       <div>
         <label
           htmlFor="password"
-          className="mb-2 block text-sm font-medium text-gray-700"
+          className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
         >
           Password <span className="text-red-500">*</span>
         </label>
@@ -1091,12 +1091,12 @@ function StepSix({ formData, updateFormData }: StepProps) {
             value={formData.password}
             onChange={(e) => updateFormData('password', e.target.value)}
             placeholder="••••••••"
-            className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 pr-10 text-gray-900 placeholder-gray-400 shadow-sm transition-all duration-200 focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20 focus:outline-none"
+            className="block w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700/60 px-3 py-2.5 pr-10 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder:text-gray-500 shadow-sm transition-all duration-200 focus:border-pink-500 dark:focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20 dark:focus:ring-pink-900/30 focus:outline-none"
           />
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-400 transition-colors duration-200 hover:text-gray-600"
+            className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-400 transition-colors duration-200 hover:text-gray-600 dark:hover:text-gray-200"
           >
             {showPassword ? (
               <EyeOff className="h-5 w-5" />
@@ -1105,13 +1105,13 @@ function StepSix({ formData, updateFormData }: StepProps) {
             )}
           </button>
         </div>
-        <p className="mt-1 text-xs text-gray-500">Minimum 8 characters</p>
+        <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Minimum 8 characters</p>
       </div>
 
       <div>
         <label
           htmlFor="confirmPassword"
-          className="mb-2 block text-sm font-medium text-gray-700"
+          className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
         >
           Confirm Password <span className="text-red-500">*</span>
         </label>
@@ -1124,12 +1124,12 @@ function StepSix({ formData, updateFormData }: StepProps) {
             value={formData.confirmPassword}
             onChange={(e) => updateFormData('confirmPassword', e.target.value)}
             placeholder="••••••••"
-            className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 pr-10 text-gray-900 placeholder-gray-400 shadow-sm transition-all duration-200 focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20 focus:outline-none"
+            className="block w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700/60 px-3 py-2.5 pr-10 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder:text-gray-500 shadow-sm transition-all duration-200 focus:border-pink-500 dark:focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20 dark:focus:ring-pink-900/30 focus:outline-none"
           />
           <button
             type="button"
             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-            className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-400 transition-colors duration-200 hover:text-gray-600"
+            className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-400 transition-colors duration-200 hover:text-gray-600 dark:hover:text-gray-200"
           >
             {showConfirmPassword ? (
               <EyeOff className="h-5 w-5" />

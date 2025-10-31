@@ -82,14 +82,14 @@ export default function Chat() {
 
   return (
     <div className="flex h-screen flex-col">
-      <div className="border-b border-gray-200 bg-white px-4 py-4 shadow-sm">
+      <div className="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-4 shadow-sm dark:shadow-gray-900/20">
         <div className="mx-auto flex max-w-4xl items-center">
           <button
             onClick={() => navigate('/matches')}
-            className="mr-4 rounded-full p-2 transition-colors hover:bg-gray-100"
+            className="mr-4 rounded-full p-2 transition-colors hover:bg-gray-100 dark:hover:bg-gray-700"
           >
             <svg
-              className="h-6 w-6 text-gray-600"
+              className="h-6 w-6 text-gray-600 dark:text-gray-300"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -110,10 +110,10 @@ export default function Chat() {
                 className="h-10 w-10 rounded-full object-cover ring-2 ring-pink-500"
               />
               <div className="ml-3">
-                <h2 className="font-semibold text-gray-900">
+                <h2 className="font-semibold text-gray-900 dark:text-gray-100">
                   {matchInfo.matchedUser.name}
                 </h2>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
                   {matchInfo.matchedUser.age}
                   {(matchInfo.matchedUser.city ||
                     matchInfo.matchedUser.province) && (
@@ -139,7 +139,7 @@ export default function Chat() {
           {messages.length === 0 ? (
             <div className="py-12 text-center">
               <div className="mb-4 text-5xl">💬</div>
-              <p className="text-gray-600">
+              <p className="text-gray-600 dark:text-gray-300">
                 No messages yet. Say hello to {matchInfo?.matchedUser.name}!
               </p>
             </div>
@@ -155,13 +155,13 @@ export default function Chat() {
                     className={`max-w-xs rounded-2xl px-4 py-2 ${
                       isOwn
                         ? 'bg-linear-to-r from-pink-500 to-purple-500 text-white'
-                        : 'bg-white text-gray-900 ring-1 ring-zinc-950/10'
+                        : 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 ring-1 ring-zinc-950/10 dark:ring-white/10'
                     }`}
                   >
                     <p className="break-words">{message.content}</p>
                     <p
                       className={`mt-1 text-xs ${
-                        isOwn ? 'text-pink-100' : 'text-gray-500'
+                        isOwn ? 'text-pink-100' : 'text-gray-500 dark:text-gray-400'
                       }`}
                     >
                       {new Date(message.createdAt).toLocaleTimeString([], {
@@ -178,7 +178,7 @@ export default function Chat() {
         </div>
       </div>
 
-      <div className="border-t border-gray-200 bg-white px-4 py-4">
+      <div className="border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-4">
         <form
           onSubmit={handleSendMessage}
           className="mx-auto flex max-w-4xl items-center gap-2"

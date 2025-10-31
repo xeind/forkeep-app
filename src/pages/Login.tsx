@@ -39,11 +39,11 @@ export default function Login() {
 
   return (
     <div className="flex min-h-screen items-center justify-center">
-      <Card className="w-full max-w-md rounded-3xl border-0 bg-white/80 p-10 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] ring-1 ring-zinc-950/10 backdrop-blur-xl">
+      <Card className="w-full max-w-md rounded-3xl border-0 bg-white/80 dark:bg-gray-800/80 p-10 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] ring-1 ring-zinc-950/10 dark:ring-white/10 backdrop-blur-xl">
         <CardHeader className="space-y-3 text-center">
           <Link to="/" className="block">
             <h1
-              className="cursor-pointer pb-1 text-5xl leading-tight font-bold text-gray-900 transition-colors duration-200 hover:text-pink-600"
+              className="cursor-pointer pb-1 text-5xl leading-tight font-bold text-gray-900 dark:text-gray-100 transition-colors duration-200 hover:text-pink-600"
               style={{
                 fontFamily: "'Noto Serif', Georgia, 'Times New Roman', serif",
               }}
@@ -51,7 +51,7 @@ export default function Login() {
               Forkeep
             </h1>
           </Link>
-          <p className="font-serif text-sm text-gray-600">
+          <p className="font-serif text-sm text-gray-600 dark:text-gray-300">
             Connections worth keeping
           </p>
         </CardHeader>
@@ -77,7 +77,7 @@ export default function Login() {
               />
 
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-sm font-medium text-gray-700">
+                <Label htmlFor="password" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   Password
                 </Label>
                 <div className="relative">
@@ -93,7 +93,7 @@ export default function Login() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors duration-200"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors duration-200"
                     tabIndex={-1}
                   >
                     {showPassword ? (
@@ -123,11 +123,11 @@ export default function Login() {
               </MotionButton>
             </div>
 
-            <p className="text-center text-sm text-gray-600">
+            <p className="text-center text-sm text-gray-600 dark:text-gray-300">
               Don't have an account?{' '}
               <Link
                 to="/signup"
-                className="font-medium text-pink-600 transition-colors duration-200 hover:text-pink-700 hover:underline"
+                className="font-medium text-pink-600 dark:text-pink-400 transition-colors duration-200 hover:text-pink-700 dark:hover:text-pink-300 hover:underline"
               >
                 Sign up
               </Link>
@@ -136,7 +136,7 @@ export default function Login() {
 
           {!import.meta.env.PROD && (
             <div className="mt-6 text-center">
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-500 dark:text-gray-400">
                 Test: ben@forkeep.app / password123
               </p>
             </div>

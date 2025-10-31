@@ -70,12 +70,12 @@ export default function Signup() {
 
   return (
     <div className="flex min-h-screen items-center justify-center py-12">
-      <Card className="w-full max-w-md rounded-3xl border-0 bg-white/80 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] ring-zinc-950/20 backdrop-blur-xl">
+      <Card className="w-full max-w-md rounded-3xl border-0 bg-white/80 dark:bg-gray-800/80 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] ring-zinc-950/20 dark:ring-white/10 backdrop-blur-xl">
         <CardHeader className="space-y-3 text-center">
           <h1 className="rounded-md bg-linear-to-r from-pink-600 to-purple-600 bg-clip-text pb-1 font-serif text-5xl leading-tight font-bold text-transparent">
             Forkeep
           </h1>
-          <p className="font-serif text-sm text-gray-600">
+          <p className="font-serif text-sm text-gray-600 dark:text-gray-300">
             Create your profile and start matching
           </p>
         </CardHeader>
@@ -154,11 +154,11 @@ export default function Signup() {
               {loading ? 'Creating account...' : 'Sign Up'}
             </MotionButton>
 
-            <p className="text-center text-sm text-gray-600">
+            <p className="text-center text-sm text-gray-600 dark:text-gray-300">
               Already have an account?{' '}
               <Link
                 to="/"
-                className="font-medium text-pink-600 transition-colors duration-200 hover:text-pink-500"
+                className="font-medium text-pink-600 dark:text-pink-400 transition-colors duration-200 hover:text-pink-500 dark:hover:text-pink-300"
               >
                 Sign in
               </Link>

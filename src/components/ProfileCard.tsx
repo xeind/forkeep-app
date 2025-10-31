@@ -20,9 +20,9 @@ const formatPreferences = (lookingForGenders: string[]): string => {
 
 export function ProfileCardFront({ user }: { user: User }) {
   return (
-    <div className="absolute h-[600px] w-96 overflow-hidden rounded-3xl bg-[#F5F5F5] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] ring-1 ring-zinc-600/20 select-none">
+    <div className="absolute h-[600px] w-96 overflow-hidden rounded-3xl bg-[#F5F5F5] dark:bg-gray-800 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] dark:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] ring-1 ring-zinc-600/20 dark:ring-white/10 select-none">
       <div className="relative h-[450px] w-full p-3">
-        <div className="h-full w-full overflow-hidden rounded-tl-[20px] rounded-tr-[20px] rounded-br-md rounded-bl-md ring-1 ring-zinc-950/20">
+        <div className="h-full w-full overflow-hidden rounded-tl-[20px] rounded-tr-[20px] rounded-br-md rounded-bl-md ring-1 ring-zinc-950/20 dark:ring-white/20">
           <img
             src={user.photoUrl}
             alt={user.name}
@@ -35,13 +35,13 @@ export function ProfileCardFront({ user }: { user: User }) {
       <div className="relative flex h-[220px] flex-col justify-between px-3 pb-6">
         <div>
           <div className="mb-2">
-            <h2 className="font-serif text-3xl leading-none font-normal text-[#6b5d4f]">
+            <h2 className="font-serif text-3xl leading-none font-normal text-[#6b5d4f] dark:text-gray-100">
               {user.name}
             </h2>
           </div>
 
           <div className="mb-2 flex items-center gap-2">
-            <span className="flex items-center font-serif text-2xl font-normal text-[#8b7d6f]">
+            <span className="flex items-center font-serif text-2xl font-normal text-[#8b7d6f] dark:text-gray-300">
               {user.age}
             </span>
             <div
@@ -59,7 +59,7 @@ export function ProfileCardFront({ user }: { user: User }) {
               <span className="text-xs font-medium">{user.gender}</span>
             </div>
             {user.lookingForGenders && user.lookingForGenders.length > 0 && (
-              <div className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2 py-1 text-gray-700">
+              <div className="inline-flex items-center gap-1 rounded-full bg-gray-100 dark:bg-gray-700 px-2 py-1 text-gray-700 dark:text-gray-200">
                 <Search className="h-3 w-3" />
                 <span className="text-xs font-medium">
                   {formatPreferences(user.lookingForGenders)}
@@ -81,7 +81,7 @@ export function ProfileCardFront({ user }: { user: User }) {
 
           {(user.city || user.province) && (
             <div className="">
-              <span className="text-l font-serif font-normal text-[#8b7d6f]">
+              <span className="text-l font-serif font-normal text-[#8b7d6f] dark:text-gray-300">
                 {user.city && user.province
                   ? `${user.city}, ${user.province}`
                   : user.city || user.province}
@@ -90,7 +90,7 @@ export function ProfileCardFront({ user }: { user: User }) {
           )}
         </div>
 
-        <div className="text-center text-xs font-medium text-[#a8998a]">
+        <div className="text-center text-xs font-medium text-[#a8998a] dark:text-gray-400">
           Tap to flip
         </div>
       </div>
@@ -100,7 +100,7 @@ export function ProfileCardFront({ user }: { user: User }) {
 
 export function ProfileCardBack({ user }: { user: User }) {
   return (
-    <div className="absolute h-[600px] w-96 overflow-hidden rounded-3xl bg-[#FCFBF7] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] ring-1 ring-zinc-950/20 select-none">
+    <div className="absolute h-[600px] w-96 overflow-hidden rounded-3xl bg-[#FCFBF7] dark:bg-gray-800 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] dark:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] ring-1 ring-zinc-950/20 dark:ring-white/10 select-none">
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.15]"
         style={{
@@ -112,7 +112,7 @@ export function ProfileCardBack({ user }: { user: User }) {
       <div className="relative z-10 flex h-full flex-col p-8">
         <div className="mb-6">
           <h3
-            className="mb-2 text-3xl font-bold text-[#6b5d4f]"
+            className="mb-2 text-3xl font-bold text-[#6b5d4f] dark:text-gray-100"
             style={{ fontFamily: 'cursive' }}
           >
             About Me
@@ -122,37 +122,37 @@ export function ProfileCardBack({ user }: { user: User }) {
 
         <div className="flex-1 overflow-y-auto">
           <div className="mb-6">
-            <h4 className="mb-2 text-sm font-semibold tracking-wide text-[#a8998a] uppercase">
+            <h4 className="mb-2 text-sm font-semibold tracking-wide text-[#a8998a] dark:text-gray-400 uppercase">
               Bio
             </h4>
-            <p className="leading-relaxed text-[#6b5d4f]">{user.bio}</p>
+            <p className="leading-relaxed text-[#6b5d4f] dark:text-gray-300">{user.bio}</p>
           </div>
 
           <div className="space-y-3">
             <div className="flex items-center gap-3 text-sm">
-              <span className="w-20 font-semibold text-[#6b5d4f]">Gender:</span>
-              <span className="text-[#8b7d6f]">{user.gender}</span>
+              <span className="w-20 font-semibold text-[#6b5d4f] dark:text-gray-200">Gender:</span>
+              <span className="text-[#8b7d6f] dark:text-gray-300">{user.gender}</span>
             </div>
             <div className="flex items-center gap-3 text-sm">
-              <span className="w-20 font-semibold text-[#6b5d4f]">Age:</span>
-              <span className="text-[#8b7d6f]">{user.age}</span>
+              <span className="w-20 font-semibold text-[#6b5d4f] dark:text-gray-200">Age:</span>
+              <span className="text-[#8b7d6f] dark:text-gray-300">{user.age}</span>
             </div>
             {user.lookingForGenders && user.lookingForGenders.length > 0 && (
               <div className="flex items-center gap-3 text-sm">
-                <span className="w-20 font-semibold text-[#6b5d4f]">
+                <span className="w-20 font-semibold text-[#6b5d4f] dark:text-gray-200">
                   Looking for:
                 </span>
-                <span className="font-medium text-[#8b7d6f]">
+                <span className="font-medium text-[#8b7d6f] dark:text-gray-300">
                   {formatPreferences(user.lookingForGenders)}
                 </span>
               </div>
             )}
             {user.birthday && (
               <div className="flex items-center gap-3 text-sm">
-                <span className="w-20 font-semibold text-[#6b5d4f]">
+                <span className="w-20 font-semibold text-[#6b5d4f] dark:text-gray-200">
                   Birthday:
                 </span>
-                <span className="text-[#8b7d6f]">
+                <span className="text-[#8b7d6f] dark:text-gray-300">
                   {new Date(user.birthday).toLocaleDateString('en-US', {
                     year: 'numeric',
                     month: 'long',
@@ -163,10 +163,10 @@ export function ProfileCardBack({ user }: { user: User }) {
             )}
             {(user.city || user.province) && (
               <div className="flex items-center gap-3 text-sm">
-                <span className="w-20 font-semibold text-[#6b5d4f]">
+                <span className="w-20 font-semibold text-[#6b5d4f] dark:text-gray-200">
                   Location:
                 </span>
-                <span className="text-[#8b7d6f]">
+                <span className="text-[#8b7d6f] dark:text-gray-300">
                   {user.city && user.province
                     ? `${user.city}, ${user.province}`
                     : user.city || user.province}
@@ -177,7 +177,7 @@ export function ProfileCardBack({ user }: { user: User }) {
 
           {user.photos && user.photos.length > 0 && (
             <div className="mt-6">
-              <h4 className="mb-3 text-sm font-semibold tracking-wide text-[#a8998a] uppercase">
+              <h4 className="mb-3 text-sm font-semibold tracking-wide text-[#a8998a] dark:text-gray-400 uppercase">
                 More Photos
               </h4>
               <div className="grid grid-cols-3 gap-2">
@@ -187,7 +187,7 @@ export function ProfileCardBack({ user }: { user: User }) {
                   .map((photo, i) => (
                     <div
                       key={i}
-                      className="aspect-square overflow-hidden rounded-xl ring-1 ring-[#d4c5b0]/30"
+                      className="aspect-square overflow-hidden rounded-xl ring-1 ring-[#d4c5b0]/30 dark:ring-white/20"
                     >
                       <img
                         src={photo}
@@ -202,7 +202,7 @@ export function ProfileCardBack({ user }: { user: User }) {
           )}
         </div>
 
-        <div className="mt-4 text-center text-xs font-medium text-[#a8998a]">
+        <div className="mt-4 text-center text-xs font-medium text-[#a8998a] dark:text-gray-400">
           Tap to flip back
         </div>
       </div>

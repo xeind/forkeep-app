@@ -78,6 +78,10 @@ body {
   overflow-y: scroll;
 }
 
+.dark body {
+  background: linear-gradient(135deg, #0f0f1a 0%, #1a1525 50%, #151a2e 100%);
+}
+
 body::before {
   content: '';
   position: fixed;
@@ -91,6 +95,13 @@ body::before {
     radial-gradient(at 40% 80%, rgba(254, 202, 202, 0.3) 0, transparent 50%);
   pointer-events: none;
   z-index: -1;
+}
+
+.dark body::before {
+  background-image:
+    radial-gradient(at 20% 30%, rgba(236, 72, 153, 0.15) 0, transparent 50%),
+    radial-gradient(at 80% 70%, rgba(168, 85, 247, 0.15) 0, transparent 50%),
+    radial-gradient(at 40% 80%, rgba(249, 115, 22, 0.1) 0, transparent 50%);
 }
 
 @media (prefers-reduced-motion: reduce) {

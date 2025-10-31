@@ -279,7 +279,7 @@ export default function Profile() {
       <div className="flex h-screen items-center justify-center">
         <div className="text-center">
           <Spinner color="#ec4899" size={48} />
-          <p className="mt-4 text-gray-600">Loading profile...</p>
+          <p className="mt-4 text-gray-600 dark:text-gray-300">Loading profile...</p>
         </div>
       </div>
     );
@@ -315,14 +315,14 @@ export default function Profile() {
           >
             <div className="flex flex-col items-center gap-2">
               <h1
-                className="bg-linear-to-r from-gray-900 to-gray-700 bg-clip-text text-3xl font-bold text-transparent"
+                className="bg-linear-to-r from-gray-900 to-gray-700 dark:from-gray-100 dark:to-gray-300 bg-clip-text text-3xl font-bold text-transparent"
                 style={{
                   fontFamily: "'Noto Serif', Georgia, 'Times New Roman', serif",
                 }}
               >
                 Your Profile
               </h1>
-              <p className="text-sm text-gray-600">Your card preview</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">Your card preview</p>
             </div>
             <div className="relative h-[600px] w-96">
               <motion.div
@@ -408,22 +408,22 @@ export default function Profile() {
           >
             <motion.div
               layout
-              className="overflow-hidden rounded-3xl bg-white/80 p-8 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] ring-1 ring-zinc-950/10 backdrop-blur-xl"
+              className="overflow-hidden rounded-3xl bg-white/80 dark:bg-gray-800/80 p-8 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] ring-1 ring-zinc-950/10 dark:ring-white/10 backdrop-blur-xl"
             >
-              <h2 className="mb-6 bg-linear-to-r from-gray-900 to-gray-700 bg-clip-text text-center text-2xl font-bold text-transparent">
+              <h2 className="mb-6 bg-linear-to-r from-gray-900 to-gray-700 dark:from-gray-100 dark:to-gray-300 bg-clip-text text-center text-2xl font-bold text-transparent">
                 Edit Photos
               </h2>
 
               <div className="space-y-6">
                 {uploadingPhoto && (
-                  <div className="rounded-lg bg-pink-50 p-3 text-center text-sm text-pink-600 ring-1 ring-pink-200">
+                  <div className="rounded-lg bg-pink-50 dark:bg-pink-900/30 p-3 text-center text-sm text-pink-600 dark:text-pink-300 ring-1 ring-pink-200 dark:ring-pink-700">
                     Uploading photo...
                   </div>
                 )}
 
                 <div className="space-y-4">
                   <div>
-                    <label className="text-sm font-medium text-gray-700">
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                       Main Photo
                     </label>
                     <div className="relative mt-2">
@@ -439,7 +439,7 @@ export default function Profile() {
                       />
                       <label
                         htmlFor="main-photo-upload"
-                        className="group relative block aspect-[3/4] cursor-pointer overflow-hidden rounded-2xl bg-gray-100 ring-1 ring-gray-200 transition-all hover:ring-2 hover:ring-pink-400"
+                        className="group relative block aspect-[3/4] cursor-pointer overflow-hidden rounded-2xl bg-gray-100 dark:bg-gray-700 ring-1 ring-gray-200 dark:ring-gray-600 transition-all hover:ring-2 hover:ring-pink-400"
                       >
                         <img
                           src={photoData.photoUrl}
@@ -447,9 +447,9 @@ export default function Profile() {
                           className="h-full w-full object-cover transition-opacity group-hover:opacity-75"
                         />
                         <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
-                          <div className="rounded-full bg-white/90 p-3">
+                          <div className="rounded-full bg-white/90 dark:bg-gray-800/90 p-3">
                             <svg
-                              className="h-6 w-6 text-gray-700"
+                              className="h-6 w-6 text-gray-700 dark:text-gray-200"
                               fill="none"
                               viewBox="0 0 24 24"
                               stroke="currentColor"
@@ -474,7 +474,7 @@ export default function Profile() {
                   </div>
 
                   <div>
-                    <label className="text-sm font-medium text-gray-700">
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                       Additional Photos (3)
                     </label>
                     <div className="mt-2 grid grid-cols-3 gap-3">
@@ -492,7 +492,7 @@ export default function Profile() {
                           />
                           <label
                             htmlFor={`photo-upload-${index}`}
-                            className="group relative block aspect-[3/4] cursor-pointer overflow-hidden rounded-xl bg-gray-100 ring-1 ring-gray-200 transition-all hover:ring-2 hover:ring-pink-400"
+                            className="group relative block aspect-[3/4] cursor-pointer overflow-hidden rounded-xl bg-gray-100 dark:bg-gray-700 ring-1 ring-gray-200 dark:ring-gray-600 transition-all hover:ring-2 hover:ring-pink-400"
                           >
                             {photoData.photos[index] ? (
                               <>
@@ -527,7 +527,7 @@ export default function Profile() {
                                 </div>
                               </>
                             ) : (
-                              <div className="flex h-full items-center justify-center text-gray-400 transition-colors group-hover:text-pink-500">
+                              <div className="flex h-full items-center justify-center text-gray-400 dark:text-gray-500 transition-colors group-hover:text-pink-500">
                                 <svg
                                   className="h-8 w-8"
                                   fill="none"
@@ -574,9 +574,9 @@ export default function Profile() {
           >
             <motion.div
               layout
-              className="overflow-hidden rounded-3xl bg-white/80 p-8 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] ring-1 ring-zinc-950/10 backdrop-blur-xl"
+              className="overflow-hidden rounded-3xl bg-white/80 dark:bg-gray-800/80 p-8 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] ring-1 ring-zinc-950/10 dark:ring-white/10 backdrop-blur-xl"
             >
-              <h2 className="mb-6 bg-linear-to-r from-gray-900 to-gray-700 bg-clip-text text-center text-2xl font-bold text-transparent">
+              <h2 className="mb-6 bg-linear-to-r from-gray-900 to-gray-700 dark:from-gray-100 dark:to-gray-300 bg-clip-text text-center text-2xl font-bold text-transparent">
                 Edit Profile
               </h2>
 
@@ -585,7 +585,7 @@ export default function Profile() {
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
-                    className="rounded-lg bg-red-50 p-3 text-sm text-red-600 ring-1 ring-red-200"
+                    className="rounded-lg bg-red-50 dark:bg-red-900/30 p-3 text-sm text-red-600 dark:text-red-300 ring-1 ring-red-200 dark:ring-red-700"
                   >
                     {error}
                   </motion.div>
@@ -603,26 +603,26 @@ export default function Profile() {
                     }
                     maxLength={16}
                   />
-                  <p className="text-right text-xs text-gray-500">
+                  <p className="text-right text-xs text-gray-500 dark:text-gray-400">
                     {formData.name.length}/16 characters
                   </p>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">
-                    Birthday <span className="text-gray-400">(optional)</span>
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Birthday <span className="text-gray-400 dark:text-gray-500">(optional)</span>
                   </label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <button
                         type="button"
-                        className="flex h-11 w-full items-center justify-between rounded-xl border border-gray-200 bg-white/80 px-4 py-3 text-sm transition-all hover:border-pink-300 focus:border-pink-400 focus:ring-2 focus:ring-pink-100 focus:outline-none"
+                        className="flex h-11 w-full items-center justify-between rounded-xl border border-gray-200 dark:border-gray-600 bg-white/80 dark:bg-gray-700/80 px-4 py-3 text-sm transition-all hover:border-pink-300 focus:border-pink-400 focus:ring-2 focus:ring-pink-100 dark:focus:ring-pink-900 focus:outline-none"
                       >
                         <span
                           className={
                             formData.birthday
-                              ? 'text-gray-900'
-                              : 'text-gray-400'
+                              ? 'text-gray-900 dark:text-gray-100'
+                              : 'text-gray-400 dark:text-gray-500'
                           }
                         >
                           {formData.birthday
@@ -633,7 +633,7 @@ export default function Profile() {
                               })
                             : 'Select your birthday'}
                         </span>
-                        <CalendarIcon className="h-4 w-4 text-gray-400" />
+                        <CalendarIcon className="h-4 w-4 text-gray-400 dark:text-gray-500" />
                       </button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
@@ -663,7 +663,7 @@ export default function Profile() {
                     </PopoverContent>
                   </Popover>
                   {formData.birthday && (
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
                       Age:{' '}
                       {(() => {
                         const today = new Date();
@@ -684,15 +684,15 @@ export default function Profile() {
                   )}
                 </div>
 
-                <div className="flex items-center justify-between rounded-xl border border-gray-200 bg-white/80 p-4">
+                <div className="flex items-center justify-between rounded-xl border border-gray-200 dark:border-gray-600 bg-white/80 dark:bg-gray-700/80 p-4">
                   <div className="flex-1">
                     <label
                       htmlFor="showBirthday"
-                      className="text-sm font-medium text-gray-700"
+                      className="text-sm font-medium text-gray-700 dark:text-gray-300"
                     >
                       Show my birthday on profile
                     </label>
-                    <p className="mt-0.5 text-xs text-gray-500">
+                    <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
                       Others will {formData.showBirthday ? 'see' : 'not see'}{' '}
                       your birthday
                     </p>
@@ -704,7 +704,7 @@ export default function Profile() {
                 </div>
 
                 <div>
-                  <label className="mb-3 block text-sm font-medium text-gray-700">
+                  <label className="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     I am:
                   </label>
                   <div className="grid grid-cols-4 gap-3">
@@ -729,7 +729,7 @@ export default function Profile() {
                                 : option.color === 'purple'
                                   ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-lg ring-2 ring-purple-500/50'
                                   : 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-lg ring-2 ring-gray-500/50'
-                            : 'bg-white/60 text-gray-700 ring-1 ring-zinc-950/10 hover:bg-white hover:ring-pink-500/30'
+                            : 'bg-white/60 dark:bg-gray-700/60 text-gray-700 dark:text-gray-200 ring-1 ring-zinc-950/10 dark:ring-white/10 hover:bg-white dark:hover:bg-gray-700 hover:ring-pink-500/30'
                         }`}
                       >
                         {option.value}
@@ -739,7 +739,7 @@ export default function Profile() {
                 </div>
 
                 <div>
-                  <label className="mb-3 block text-sm font-medium text-gray-700">
+                  <label className="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Interested in:
                   </label>
                   <div className="grid grid-cols-4 gap-3">
@@ -760,7 +760,7 @@ export default function Profile() {
                               : option.color === 'pink'
                                 ? 'bg-gradient-to-r from-pink-500 to-pink-600 text-white shadow-lg ring-2 ring-pink-500/50'
                                 : 'bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 text-white shadow-lg ring-2 ring-purple-500/50'
-                            : 'bg-white/60 text-gray-700 ring-1 ring-zinc-950/10 hover:bg-white hover:ring-pink-500/30'
+                            : 'bg-white/60 dark:bg-gray-700/60 text-gray-700 dark:text-gray-200 ring-1 ring-zinc-950/10 dark:ring-white/10 hover:bg-white dark:hover:bg-gray-700 hover:ring-pink-500/30'
                         }`}
                       >
                         {option.value}

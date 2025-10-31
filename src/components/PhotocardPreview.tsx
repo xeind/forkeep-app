@@ -26,7 +26,7 @@ export default function PhotocardPreview({
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.3, ease: 'easeOut' }}
-      className="relative mx-auto w-full max-w-sm overflow-hidden rounded-2xl bg-white shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] ring-1 ring-zinc-950/10"
+      className="relative mx-auto w-full max-w-sm overflow-hidden rounded-2xl bg-white dark:bg-gray-800 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] ring-1 ring-zinc-950/10 dark:ring-white/10"
     >
       <div className="relative aspect-[3/4] overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
         {photoUrl ? (

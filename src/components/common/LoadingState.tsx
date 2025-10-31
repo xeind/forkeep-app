@@ -13,7 +13,7 @@ export default function LoadingState({
   if (variant === 'profile-card') {
     return (
       <div className="flex h-screen items-center justify-center">
-        <div className="relative h-[600px] w-96 overflow-hidden rounded-3xl bg-white shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15),0_0_1px_0_rgba(0,0,0,0.2)] ring-1 ring-zinc-950/10">
+        <div className="relative h-[600px] w-96 overflow-hidden rounded-3xl bg-white dark:bg-gray-800 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15),0_0_1px_0_rgba(0,0,0,0.2)] ring-1 ring-zinc-950/10 dark:ring-white/10">
           <Skeleton className="h-64 w-full rounded-none" />
 
           <div className="p-6">
@@ -45,7 +45,7 @@ export default function LoadingState({
     <div className="flex h-screen items-center justify-center">
       <div className="text-center">
         <Spinner color="#ec4899" size={48} />
-        <p className="mt-4 text-gray-600">{message}</p>
+        <p className="mt-4 text-gray-600 dark:text-gray-300">{message}</p>
       </div>
     </div>
   );

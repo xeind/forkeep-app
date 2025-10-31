@@ -7,7 +7,7 @@ export default function TopBar() {
       <motion.button
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
-        className="rounded-md bg-linear-to-b from-[#FB64B6] to-[#E60076] px-6 py-3 text-xl font-bold text-white shadow-[0px_0px_1px_1px_rgba(255,255,255,0.08)_inset,0px_1px_1.5px_0px_rgba(0,0,0,0.32),0px_0px_0px_0.5px_#ec4899] transition-all duration-200"
+        className="rounded-md bg-linear-to-b from-[#FB64B6] to-[#E60076] px-6 py-3 text-xl font-bold text-white shadow-[0px_0px_1px_1px_rgba(255,255,255,0.08)_inset,0px_1px_1.5px_0px_rgba(0,0,0,0.32),0px_0px_0px_0.5px_#ec4899] dark:shadow-[0px_0px_1px_1px_rgba(255,255,255,0.12)_inset,0px_2px_4px_0px_rgba(0,0,0,0.5),0px_0px_0px_0.5px_#ec4899] transition-all duration-200"
         style={{
           fontFamily: "'Noto Serif', Georgia, 'Times New Roman', serif",
         }}

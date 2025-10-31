@@ -64,7 +64,7 @@ export default function UserProfile() {
       <div className="flex h-screen items-center justify-center">
         <div className="text-center">
           <Spinner color="#ec4899" size={48} />
-          <p className="mt-4 text-gray-600">Loading profile.</p>
+          <p className="mt-4 text-gray-600 dark:text-gray-300">Loading profile.</p>
         </div>
       </div>
     );
@@ -75,10 +75,10 @@ export default function UserProfile() {
       <div className="flex h-screen items-center justify-center">
         <div className="text-center">
           <div className="mb-4 text-6xl">😕</div>
-          <h2 className="text-2xl font-bold text-gray-800">
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
             Profile not found
           </h2>
-          <p className="mt-2 text-gray-600">
+          <p className="mt-2 text-gray-600 dark:text-gray-300">
             This user profile could not be loaded.
           </p>
           <motion.button

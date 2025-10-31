@@ -12,7 +12,7 @@ function Navbar() {
 
   return (
     <nav
-      className="fixed left-6 z-40 flex flex-col gap-2 rounded-3xl bg-white/80 p-3 shadow-[0px_0px_1px_1px_rgba(255,255,255,0.08)_inset,0px_1px_1.5px_0px_rgba(0,0,0,0.32),0px_0px_0px_0.5px_rgba(0,0,0,0.1)] backdrop-blur-xl"
+      className="fixed left-6 z-40 flex flex-col gap-2 rounded-3xl bg-white/80 dark:bg-gray-800/80 p-3 shadow-[0px_0px_1px_1px_rgba(255,255,255,0.08)_inset,0px_1px_1.5px_0px_rgba(0,0,0,0.32),0px_0px_0px_0.5px_rgba(0,0,0,0.1)] dark:shadow-[0px_0px_1px_1px_rgba(255,255,255,0.05)_inset,0px_1px_1.5px_0px_rgba(0,0,0,0.5),0px_0px_0px_0.5px_rgba(255,255,255,0.1)] backdrop-blur-xl"
       style={{
         top: '50%',
         transform: 'translate3d(0, -50%, 0)',
@@ -24,7 +24,7 @@ function Navbar() {
         className={`group relative flex h-14 w-14 items-center justify-center rounded-xl transition-all duration-200 ease-out ${
           isActive('/discover')
             ? 'text-white'
-            : 'text-zinc-400 hover:scale-105 hover:bg-pink-50 hover:text-pink-500'
+            : 'text-zinc-400 dark:text-zinc-500 hover:scale-105 hover:bg-pink-50 dark:hover:bg-pink-900/20 hover:text-pink-500'
         }`}
         title="Discover"
       >
@@ -58,7 +58,7 @@ function Navbar() {
         className={`group relative flex h-14 w-14 items-center justify-center rounded-xl transition-all duration-200 ease-out ${
           isActive('/matches')
             ? 'text-white'
-            : 'text-zinc-400 hover:scale-105 hover:bg-pink-50 hover:text-pink-500'
+            : 'text-zinc-400 dark:text-zinc-500 hover:scale-105 hover:bg-pink-50 dark:hover:bg-pink-900/20 hover:text-pink-500'
         }`}
         title="Matches"
       >
@@ -92,7 +92,7 @@ function Navbar() {
         className={`group relative flex h-14 w-14 items-center justify-center rounded-xl transition-all duration-200 ease-out ${
           isActive('/profile')
             ? 'text-white'
-            : 'text-zinc-400 hover:scale-105 hover:bg-pink-50 hover:text-pink-500'
+            : 'text-zinc-400 dark:text-zinc-500 hover:scale-105 hover:bg-pink-50 dark:hover:bg-pink-900/20 hover:text-pink-500'
         }`}
         title="Profile"
       >
@@ -121,14 +121,14 @@ function Navbar() {
         </svg>
       </Link>
 
-      <div className="my-2 h-px bg-linear-to-r from-transparent via-zinc-200 to-transparent" />
+      <div className="my-2 h-px bg-gradient-to-r from-transparent via-zinc-200 dark:via-zinc-700 to-transparent" />
 
       <Link
         to="/settings"
         className={`group relative flex h-14 w-14 items-center justify-center rounded-xl transition-all duration-200 ease-out ${
           isActive('/settings')
             ? 'text-white'
-            : 'text-zinc-400 hover:scale-105 hover:bg-pink-50 hover:text-pink-500'
+            : 'text-zinc-400 dark:text-zinc-500 hover:scale-105 hover:bg-pink-50 dark:hover:bg-pink-900/20 hover:text-pink-500'
         }`}
         title="Settings"
       >

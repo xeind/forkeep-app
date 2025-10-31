@@ -43,8 +43,8 @@ export default function EmptyState({
             {icon}
           </motion.div>
         )}
-        <h2 className="text-2xl font-bold text-gray-800">{title}</h2>
-        <p className="mt-2 text-gray-600">{message}</p>
+        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">{title}</h2>
+        <p className="mt-2 text-gray-600 dark:text-gray-300">{message}</p>
         {action && (
           <MotionButton
             onClick={action.onClick}

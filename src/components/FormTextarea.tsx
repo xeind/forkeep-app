@@ -15,7 +15,7 @@ const FormTextarea = forwardRef<HTMLTextAreaElement, FormTextareaProps>(
         {label && (
           <Label
             htmlFor={id}
-            className="mb-1 block text-sm font-medium text-gray-700"
+            className="mb-1 block text-sm font-medium"
           >
             {label}
           </Label>
@@ -25,13 +25,13 @@ const FormTextarea = forwardRef<HTMLTextAreaElement, FormTextareaProps>(
           id={id}
           aria-invalid={error ? 'true' : 'false'}
           className={cn(
-            'resize-none border-0 bg-white/60 px-4 py-3 text-gray-900 shadow-sm ring-1 ring-zinc-950/10 transition-all duration-200 ring-inset placeholder:text-gray-400 focus:bg-white focus:ring-2 focus:ring-pink-500 focus:outline-none',
+            'resize-none border-0 bg-white/60 dark:bg-gray-700/60 px-4 py-3 shadow-sm ring-1 ring-zinc-950/10 dark:ring-white/10 transition-all duration-200 ring-inset placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-pink-500 focus:outline-none dark:text-gray-100',
             error && 'ring-red-500 focus:ring-red-500',
             className
           )}
           {...props}
         />
-        {error && <p className="mt-2 px-1 text-sm text-red-600">{error}</p>}
+        {error && <p className="mt-2 px-1 text-sm text-red-600 dark:text-red-400">{error}</p>}
       </div>
     );
   }

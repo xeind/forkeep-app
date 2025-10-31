@@ -112,11 +112,11 @@ export default function Matches() {
             style={{
               fontFamily: "'Noto Serif', Georgia, 'Times New Roman', serif",
             }}
-            className="bg-linear-to-r from-gray-900 to-gray-700 bg-clip-text text-3xl font-bold text-transparent"
+            className="bg-linear-to-r from-gray-900 to-gray-700 dark:from-gray-100 dark:to-gray-300 bg-clip-text text-3xl font-bold text-transparent"
           >
             Your Matches
           </h1>
-          <p className="mt-2 text-gray-600">
+          <p className="mt-2 text-gray-600 dark:text-gray-300">
             You have {matches.length}{' '}
             {matches.length === 1 ? 'match' : 'matches'}
           </p>

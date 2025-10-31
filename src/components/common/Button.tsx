@@ -25,10 +25,10 @@ export default function Button({
 
   const variantStyles = {
     primary:
-      'bg-pink-500 text-white ring-1 ring-pink-600/20 hover:bg-pink-600 hover:shadow-lg',
-    secondary: 'bg-gray-100 text-gray-600 hover:bg-gray-200',
+      'bg-pink-500 text-white ring-1 ring-pink-600/20 hover:bg-pink-600 hover:shadow-lg dark:bg-pink-600 dark:hover:bg-pink-700',
+    secondary: 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600',
     danger:
-      'bg-red-500 text-white ring-1 ring-red-600/20 hover:bg-red-600 hover:shadow-lg',
+      'bg-red-500 text-white ring-1 ring-red-600/20 hover:bg-red-600 hover:shadow-lg dark:bg-red-600 dark:hover:bg-red-700',
   };
 
   const sizeStyles = {
