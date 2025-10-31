@@ -135,10 +135,31 @@ export default function Login() {
           </form>
 
           {!import.meta.env.PROD && (
-            <div className="mt-6 text-center">
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                Test: ben@forkeep.app / password123
+            <div className="mt-6 space-y-3">
+              <p className="text-center text-xs font-medium text-gray-500 dark:text-gray-400">
+                Quick Test Login
               </p>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { name: 'Alex', email: 'alex@forkeep.app' },
+                  { name: 'Ben', email: 'ben@forkeep.app' },
+                  { name: 'Ava', email: 'ava@forkeep.app' },
+                  { name: 'Chloe', email: 'chloe@forkeep.app' },
+                  { name: 'David', email: 'david@forkeep.app' },
+                ].map((account) => (
+                  <button
+                    key={account.email}
+                    type="button"
+                    onClick={() => {
+                      setEmail(account.email);
+                      setPassword('password123');
+                    }}
+                    className="rounded-lg bg-gray-100 dark:bg-gray-700/60 px-3 py-2 text-xs font-medium text-gray-700 dark:text-gray-300 transition-colors duration-200 hover:bg-gray-200 dark:hover:bg-gray-600"
+                  >
+                    {account.name}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
         </CardContent>
